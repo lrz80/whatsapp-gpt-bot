@@ -13,27 +13,26 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
-# Inicializar cliente OpenAI
-openai.api_key = OPENAI_API_KEY  # Asigna la API key correctamente
+# Inicializar cliente OpenAI correctamente
+openai.api_key = OPENAI_API_KEY
 
 # Inicializar cliente de Twilio
 client_twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 # Conectar con SQLite
-try:
-    conn = sqlite3.connect("chatbot.db", check_same_thread=False)
-    cursor = conn.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS conversaciones (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user TEXT,
-            role TEXT,
-            content TEXT
-        )
-    """)
-    conn.commit()
-except sqlite3.Error as e:
-    print(f"⚠️ Error conectando a SQLite: {e}")
+conn = sqlite3.connect("chatbot.db", check_same_thread=False)
+cursor = conn.cursor()
+
+# Crear la tabla si no existe
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS conversaciones (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user TEXT,
+        role TEXT,
+        content TEXT
+    )
+""")
+conn.commit()
 
 @app.route("/", methods=["GET"])
 def home():
@@ -42,31 +41,43 @@ def home():
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     from_number = request.values.get("From", "").strip()
-    incoming_msg = request.values.get("Body", "").strip()
+    incoming_msg = request.values.get("Body", "").strip().lower()
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Obtener historial de conversación
-    historial = [{"role": "system", "content": "Eres un asistente de WhatsApp."}]
-    cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
-    historial += [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
-    historial.append({"role": "user", "content": incoming_msg})
+    # Base de respuestas personalizadas para Spinzone Indoorcycling
+    respuestas_personalizadas = {
+        "hola": "¡Hola! 🚴‍♂️ Bienvenido a *Spinzone Indoorcycling*. ¿En qué puedo ayudarte?",
+        "reserva": "Puedes hacer tu reserva aquí: [🔗 Reservas y horarios](https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view)",
+        "precio": "Consulta nuestros planes y precios aquí: [💰 Planes y precios](https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships)",
+        "horario": "Nuestros horarios de clases están disponibles aquí: [📆 Ver horarios](https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view)",
+        "direccion": "📍 Nos encontramos en Spinzone Indoorcycling, ¡te esperamos para una sesión increíble!",
+        "clases": "En *Spinzone Indoorcycling* ofrecemos clases de indoor cycling para todos los niveles. ¿Te gustaría más información?",
+        "instructor": "Contamos con instructores certificados que te guiarán en cada sesión. ¡Ven a conocernos!"
+    }
 
+    # Verifica si el mensaje coincide con una pregunta frecuente
+    for clave, respuesta in respuestas_personalizadas.items():
+        if clave in incoming_msg:
+            msg.body(respuesta)
+            return str(resp)
+
+    # Si no es un mensaje predefinido, usa OpenAI para responder
+    historial = [{"role": "user", "content": incoming_msg}]
+    
     try:
-        respuesta_ai = openai.client.chat.completions.create(
-    model="gpt-4",
-    messages=historial
-)
-
-        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
+        respuesta_ai = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=historial
+        )
+        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
         # Guardar mensaje y respuesta en SQLite
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
         conn.commit()
 
-        msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
-
+        msg.body(respuesta_texto)
     except Exception as e:
         print(f"❌ ERROR: {e}")
         msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
