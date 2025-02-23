@@ -13,8 +13,8 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
-# Inicializar cliente OpenAI correctamente
-client_openai = openai.Client(api_key=OPENAI_API_KEY)
+# Configurar API de OpenAI
+openai.api_key = OPENAI_API_KEY
 
 # Inicializar cliente de Twilio
 client_twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -66,11 +66,11 @@ def whatsapp_reply():
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
-        respuesta_ai = client_openai.chat.completions.create(
+        respuesta_ai = openai.ChatCompletion.create(
             model="gpt-4",
             messages=historial
         )
-        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
+        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
 
         # Guardar mensaje y respuesta en SQLite
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
