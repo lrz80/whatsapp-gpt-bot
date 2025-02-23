@@ -49,13 +49,13 @@ def whatsapp_reply():
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
-        # Nueva versión del API de OpenAI
-        respuesta_ai = openai.client.chat.completions.create(
-    model="gpt-4",
-    messages=historial
-)
+        # Generar respuesta con OpenAI
+        respuesta_ai = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=historial
+        )
 
-        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
+        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
         # Guardar mensaje y respuesta en SQLite
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
