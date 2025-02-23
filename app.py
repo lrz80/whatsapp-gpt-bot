@@ -102,12 +102,13 @@ except Exception as e:
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
-    	client_openai = openai.OpenAI(api_key=OPENAI_API_KEY)
+	client_openai = openai.OpenAI(api_key=OPENAI_API_KEY)
 
     	respuesta_ai = client_openai.chat.completions.create(
             model="gpt-4",
             messages=historial
         )
+
         # ✅ Acceder correctamente al contenido de la respuesta
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
