@@ -67,9 +67,9 @@ def whatsapp_reply():
     
     try:
         respuesta_ai = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=historial
-        )
+    model="gpt-4",
+    messages=historial
+).to_dict()
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
         # Guardar mensaje y respuesta en SQLite
