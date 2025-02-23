@@ -73,18 +73,18 @@ def whatsapp_reply():
             messages=historial
         )
         # ✅ Acceder correctamente al contenido de la respuesta
-respuesta_texto = respuesta_ai.choices[0].message.content.strip()
+        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
         # Guardar mensaje y respuesta en SQLite
-    cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
-    cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
-    conn.commit()
+        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
+        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
+        conn.commit()
 
-    msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
+        msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
 
-except Exception as e:
-    print(f"❌ ERROR: {e}")
-    msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
+        msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
     return str(resp)
 
