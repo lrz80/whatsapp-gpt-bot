@@ -50,10 +50,10 @@ def whatsapp_reply():
 
     try:
         # Nueva versión del API de OpenAI
-        respuesta_ai = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=historial
-        )
+        respuesta_ai = openai.client.chat.completions.create(
+    model="gpt-4",
+    messages=historial
+)
 
         respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
 
