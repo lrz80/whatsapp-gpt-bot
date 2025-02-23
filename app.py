@@ -45,43 +45,43 @@ def whatsapp_reply():
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Base de respuestas personalizadas para Spinzone Indoorcycling
-    respuestas_personalizadas = {
-        "hola": "¡Hola! 🚴‍♂️ Bienvenido a *Spinzone Indoorcycling*. ¿En qué puedo ayudarte?",
-        "reserva": "Puedes hacer tu reserva aquí: [🔗 Reservas y horarios](https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view)",
-        "precio": "Consulta nuestros planes y precios aquí: [💰 Planes y precios](https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships)",
-        "horario": "Nuestros horarios de clases están disponibles aquí: [📆 Ver horarios](https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view)",
-        "direccion": "📍 Nos encontramos en Spinzone Indoorcycling, ¡te esperamos para una sesión increíble!",
-        "clases": "En *Spinzone Indoorcycling* ofrecemos clases de indoor cycling para todos los niveles. ¿Te gustaría más información?",
-        "instructor": "Contamos con instructores certificados que te guiarán en cada sesión. ¡Ven a conocernos!"
+    # Preguntas frecuentes con respuestas directas
+    respuestas_rapidas = {
+        "horarios": "Puedes ver los horarios y hacer reservas aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
+        "reservas": "Para hacer una reserva, visita: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
+        "precios": "Los precios y planes de membresía los encuentras aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
+        "dirección": "Spinzone Indoorcycling está ubicado en [TU DIRECCIÓN]. ¡Te esperamos!",
+        "clases": "Consulta los horarios y disponibilidad de clases en: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
     }
 
-    # Verifica si el mensaje coincide con una pregunta frecuente
-    for clave, respuesta in respuestas_personalizadas.items():
-        if clave in incoming_msg:
-            msg.body(respuesta)
+    # Verificar si la pregunta es frecuente
+    for key, value in respuestas_rapidas.items():
+        if key in incoming_msg:
+            msg.body(value)
             return str(resp)
 
-    # Si no es un mensaje predefinido, usa OpenAI para responder
-    historial = [{"role": "user", "content": incoming_msg}]
-    
+    # Guardar historial en SQLite
+    cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
+    historial = [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
+    historial.append({"role": "user", "content": incoming_msg})
+
     try:
-    respuesta_ai = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=historial
-    )
-    respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
+        respuesta_ai = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=historial
+        )
+        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
 
-    # Guardar mensaje y respuesta en SQLite
-    cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
-    cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
-    conn.commit()
+        # Guardar mensaje y respuesta en SQLite
+        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
+        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
+        conn.commit()
 
-    msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
+        msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
 
-except Exception as e:
-    print(f"❌ ERROR: {e}")
-    msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
+        msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
     return str(resp)
 
