@@ -45,22 +45,51 @@ def whatsapp_reply():
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Respuestas rápidas para preguntas frecuentes
+    # 📌 Respuestas específicas de Spinzone Indoorcycling
     respuestas_rapidas = {
         "horarios": "Puedes ver los horarios y hacer reservas aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "reservas": "Para hacer una reserva, visita: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "precios": "Los precios y planes de membresía los encuentras aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-        "direccion": "Spinzone Indoorcycling está ubicado en 2175 Davenport Blvd Davenport Florida 33837 ¡Te esperamos!",
-        "telefono": "Puedes contactarnos al **+18633171646**",
-        "pagina web": "Visita nuestra página web aquí: **www.spinzoneic.com**",
+        "direccion": "Spinzone Indoorcycling está ubicado en **2175 Davenport Blvd Davenport Fl 33837**. ¡Te esperamos!",
+        "telefono": "Puedes contactarnos al **+18633171646**.",
+        "pagina web": "Visita nuestra página web aquí: **www.spinzoneic.com**.",
         "clases": "Consulta los horarios y disponibilidad de clases en: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
     }
 
-    # Verificar si el mensaje es una pregunta frecuente
+    # 🔍 Revisar si el mensaje es una pregunta frecuente
     for key, value in respuestas_rapidas.items():
         if key in incoming_msg:
             msg.body(value)
             return str(resp)
+
+    # 👇 Si el mensaje no está en las preguntas frecuentes, usa OpenAI
+    historial = [
+        {"role": "system", "content": "Eres el asistente virtual de Spinzone Indoorcycling. Tu trabajo es responder preguntas sobre la empresa, incluyendo dirección, teléfono, página web, precios y reservas. No menciones que eres una IA. Siempre responde con información útil y clara."}
+    ]
+
+    cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
+    historial += [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
+    historial.append({"role": "user", "content": incoming_msg})
+
+    try:
+        respuesta_ai = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=historial
+        )
+        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
+
+        # 📌 Guardar mensaje y respuesta en la base de datos
+        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
+        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
+        conn.commit()
+
+        msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
+
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
+        msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
+
+    return str(resp)
 
     # Guardar historial en SQLite
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
