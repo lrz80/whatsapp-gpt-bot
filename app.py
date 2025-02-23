@@ -14,7 +14,7 @@ TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
 # Inicializar cliente OpenAI correctamente
-openai.api_key = OPENAI_API_KEY
+client_openai = openai.Client(api_key=OPENAI_API_KEY)
 
 # Inicializar cliente de Twilio
 client_twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -45,16 +45,16 @@ def whatsapp_reply():
     resp = MessagingResponse()
     msg = resp.message()
 
-    # Preguntas frecuentes con respuestas directas
+    # Respuestas rápidas para preguntas frecuentes
     respuestas_rapidas = {
         "horarios": "Puedes ver los horarios y hacer reservas aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "reservas": "Para hacer una reserva, visita: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "precios": "Los precios y planes de membresía los encuentras aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-        "dirección": "Spinzone Indoorcycling está ubicado en [TU DIRECCIÓN]. ¡Te esperamos!",
+        "direccion": "Spinzone Indoorcycling está ubicado en [TU DIRECCIÓN]. ¡Te esperamos!",
         "clases": "Consulta los horarios y disponibilidad de clases en: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
     }
 
-    # Verificar si la pregunta es frecuente
+    # Verificar si el mensaje es una pregunta frecuente
     for key, value in respuestas_rapidas.items():
         if key in incoming_msg:
             msg.body(value)
@@ -66,11 +66,11 @@ def whatsapp_reply():
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
-        respuesta_ai = openai.ChatCompletion.create(
+        respuesta_ai = client_openai.chat.completions.create(
             model="gpt-4",
             messages=historial
         )
-        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
+        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
         # Guardar mensaje y respuesta en SQLite
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
