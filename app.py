@@ -50,7 +50,7 @@ def whatsapp_reply():
         "horarios": "Puedes ver los horarios y hacer reservas aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "reservas": "Para hacer una reserva, visita: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "precios": "Los precios y planes de membresía los encuentras aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-        "direccion": "Spinzone Indoorcycling está ubicado en [TU DIRECCIÓN]. ¡Te esperamos!",
+        "direccion": "Spinzone Indoorcycling está ubicado en 2175 Davenport Blvd Davenport Florida 33837. ¡Te esperamos!",
         "clases": "Consulta los horarios y disponibilidad de clases en: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
     }
 
@@ -62,7 +62,12 @@ def whatsapp_reply():
 
     # Guardar historial en SQLite
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
-    historial = [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
+    historial = [
+    {"role": "system", "content": "Eres el asistente virtual de Spinzone Indoorcycling. Responde preguntas sobre horarios, precios y reservas como si fueras parte del equipo de la empresa.       No menciones que eres una inteligencia artificial."}
+]
+
+    cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
+    historial += [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
