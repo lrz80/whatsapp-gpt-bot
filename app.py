@@ -51,6 +51,8 @@ def whatsapp_reply():
         "reservas": "Para hacer una reserva, visita: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
         "precios": "Los precios y planes de membresía los encuentras aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
         "direccion": "Spinzone Indoorcycling está ubicado en 2175 Davenport Blvd Davenport Florida 33837. ¡Te esperamos!",
+        "telefono": "Puedes contactarnos al **+18633171646**.",
+        "pagina web": "Visita nuestra página web aquí: **www.spinzoneic.com**.",
         "clases": "Consulta los horarios y disponibilidad de clases en: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
     }
 
