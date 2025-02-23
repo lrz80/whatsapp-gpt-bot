@@ -66,7 +66,7 @@ def whatsapp_reply():
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
-        respuesta_ai = openai.ChatCompletion.create(
+        respuesta_ai = openai.chat.completions.create(
             model="gpt-4",
             messages=historial
         )
