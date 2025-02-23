@@ -76,7 +76,7 @@ def whatsapp_reply():
             model="gpt-4",
             messages=historial
         )
-        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
+        respuesta_ai["choices"][0]["message"]["content"].strip()
 
         # 📌 Guardar mensaje y respuesta en la base de datos
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
