@@ -39,7 +39,7 @@ def home():
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     from_number = request.values.get("From", "").strip()
-    incoming_msg = request.values.get("Body", "").strip().lower()
+    incoming_msg = request.values.get("Body", "").strip()
     resp = MessagingResponse()
     msg = resp.message()
 
@@ -49,13 +49,13 @@ def whatsapp_reply():
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
-        # Generar respuesta con OpenAI
+        # Generar respuesta con OpenAI (NUEVA SINTAXIS)
         respuesta_ai = openai.ChatCompletion.create(
             model="gpt-4",
             messages=historial
         )
 
-        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
+        respuesta_texto = respuesta_ai["choices"][0]["message"]["content"].strip()
 
         # Guardar mensaje y respuesta en SQLite
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
