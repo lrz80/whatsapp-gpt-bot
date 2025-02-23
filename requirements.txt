@@ -2,3 +2,4 @@ flask
 openai
 twilio
 waitress
+openai>=1.0.0
