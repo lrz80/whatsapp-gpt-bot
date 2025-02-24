@@ -55,7 +55,7 @@ FAQS = {
     "reservar": if "reservar clase" in incoming_msg.lower():
         msg.body("¡Claro! Estoy procesando tu reserva...")
         respuesta = reservar_clase()
-        msg.body(respuesta)"    
+        msg.body(respuesta)    
 }
 
 @app.route("/", methods=["GET"])
@@ -89,7 +89,7 @@ def whatsapp_reply():
         # Verifica que el bot no diga que es una IA
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
         if "soy una inteligencia artificial" in respuesta_texto.lower():
-            respuesta_texto = "Soy el asistente virtual de SpinZone, ¿en qué puedo ayudarte?"
+            respuesta_texto = "Bienvenido a SpinZone, ¿en qué puedo ayudarte?"
 
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
