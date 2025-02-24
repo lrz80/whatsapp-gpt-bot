@@ -132,11 +132,13 @@ def reservar_clase():
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
 
-        # Conectar Selenium con Browserless
-        driver = webdriver.Remote(
-            command_executor=browserless_url,
-            options=options
-        )
+        print("Conectando con Browserless en:", browserless_url)
+
+        driver = webdriver.Remote(command_executor=browserless_url, options=options)
+
+        # Verificar si driver se creó correctamente
+        if driver is None:
+            raise Exception("Error al inicializar el WebDriver")
 
         # ✅ Abrir Glofox
         driver.get("https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view")
