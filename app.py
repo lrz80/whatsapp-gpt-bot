@@ -4,6 +4,7 @@ import openai
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
+from reservar_clase import reservar_clase
 
 app = Flask(__name__)
 
@@ -12,8 +13,6 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
-
-import openai
 
 # Asegurar que la API Key está definida
 if OPENAI_API_KEY:
@@ -90,6 +89,10 @@ def whatsapp_reply():
         conn.commit()
 
         msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
+
+        # 👉 Si el usuario quiere reservar una clase, ejecutamos Selenium
+        if "reservar clase" in incoming_msg:
+            reservar_clase()
 
     except Exception as e:
         print(f"❌ ERROR: {e}")

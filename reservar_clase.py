@@ -19,7 +19,12 @@ TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
-client_openai = openai.OpenAI(api_key=OPENAI_API_KEY)
+# Asegurar que la API Key está definida
+if OPENAI_API_KEY:
+    client_openai = openai.OpenAI(api_key=OPENAI_API_KEY)
+else:
+    raise ValueError("⚠️ ERROR: La clave de API de OpenAI no está configurada correctamente.")
+
 client_twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 # 🔹 Conectar con SQLite
