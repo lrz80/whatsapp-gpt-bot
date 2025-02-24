@@ -120,10 +120,10 @@ def whatsapp_reply():
 def reservar_clase():
     try:
         # Reemplaza "TU_API_KEY" con la API Key de Browserless
-        browserless_url = "wss://chrome.browserless.io?token=RpjC71GraniIGGbace2d072e1f4e476227bf2556b4"
+        browserless_url = "https://chrome.browserless.io/webdriver?token=RpjC71GraniIGGbace2d072e1f4e476227bf2556b4"
 
         options = webdriver.ChromeOptions()
-        options.add_argument("--headless")  # Ejecutar sin interfaz gráfica
+        options.add_argument("--headless")
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
