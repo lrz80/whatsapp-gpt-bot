@@ -42,7 +42,7 @@ cursor.execute("""
 conn.commit()
 
 # Respuestas rápidas
-incoming_msg = incoming_msg.lower()  # Convierte el mensaje a minúsculas para evitar errores
+incoming_msg = request.values.get("Body", "").strip().lower()  # Definir y limpiar incoming_msg
 
 if "horarios" in incoming_msg:
     respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
@@ -58,7 +58,9 @@ elif "sitio web" in incoming_msg or "página web" in incoming_msg:
     respuesta = "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com"
 elif "reservar clase" in incoming_msg:
     respuesta = "¡Claro! Estoy procesando tu reserva..."
-    msg.body(respuesta)  # ✅ Enviar mensaje de confirmación al usuario
+    resp = MessagingResponse()
+    msg = resp.message()
+    (respuesta)  # ✅ Enviar mensaje de confirmación al usuario
     # Llamar a la función de reserva si existe
     if "reservar_clase" in globals():  # Verifica si la función existe
         reservar_clase()
