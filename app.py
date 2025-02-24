@@ -119,11 +119,11 @@ def whatsapp_reply():
 # 🔹 Automatización con Selenium para reservas en Glofox
 def reservar_clase():
     try:
-        # Reemplaza "TU_API_KEY" con la API Key de Browserless
-        browserless_url = "https://chrome.browserless.io/webdriver?token=RpjC71GraniIGGbace2d072e1f4e476227bf2556b4"
+        # Asegurar que la API Key esté bien configurada
+        browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
 
         options = webdriver.ChromeOptions()
-        options.add_argument("--headless")
+        options.add_argument("--headless")  # Modo sin interfaz gráfica
         options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
@@ -132,7 +132,7 @@ def reservar_clase():
         driver = webdriver.Remote(
             command_executor=browserless_url,
             options=options
-    )
+        )
 
 
 
