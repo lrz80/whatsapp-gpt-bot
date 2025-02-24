@@ -46,9 +46,16 @@ FAQS = {
     "horarios": "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
     "reservas": "🔹 Reserva tu clase aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
     "precios": "💰 Consulta precios y membresías aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-    "direccion": "📍 Spinzone Indoorcycling está en 2175 Davenport Blvd Davenport Fl 33837. ¡Te esperamos!",
-    "telefono": "📞 Nuestro número es: +18633171646",
-    "pagina web": "🌐 Visítanos en: https://spinzoneic.com"
+    "direccion": "if ubicación" in incoming_msg.lower():
+        msg.body("📍 Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. ¡Te esperamos!")",
+    "telefono": "elif teléfono in incoming_msg.lower():
+        msg.body("📞 Puedes contactarnos al siguiente número: +18633171646")",
+    "pagina web": "elif "sitio web" in incoming_msg.lower():
+        msg.body("🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneic.com")"
+    "reservar": "elif "reservar clase" in incoming_msg.lower():
+        msg.body("¡Claro! Estoy procesando tu reserva...")
+        respuesta = reservar_clase()
+        msg.body(respuesta)"    
 }
 
 @app.route("/", methods=["GET"])
@@ -77,7 +84,13 @@ def whatsapp_reply():
         respuesta_ai = client_openai.chat.completions.create(
             model="gpt-4",
             messages=historial
-        )
+)
+
+        # Verifica que el bot no diga que es una IA
+        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
+        if "soy una inteligencia artificial" in respuesta_texto.lower():
+            respuesta_texto = "Soy el asistente virtual de SpinZone, ¿en qué puedo ayudarte?"
+
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
 
@@ -118,8 +131,8 @@ def reservar_clase():
         time.sleep(2)
 
         # 🔹 Iniciar sesión (modificar con credenciales de prueba)
-        driver.find_element(By.CSS_SELECTOR, "#login-register-modal input").send_keys("correo@ejemplo.com")
-        driver.find_element(By.CSS_SELECTOR, "#login-register-modal input[type='password']").send_keys("TuContraseña")
+        driver.find_element(By.CSS_SELECTOR, "#login-register-modal input").send_keys("luisamazon80@gmail.com")
+        driver.find_element(By.CSS_SELECTOR, "#login-register-modal input[type='password']").send_keys("L.r14066719")
         driver.find_element(By.CSS_SELECTOR, "#login-register-modal button").click()
         time.sleep(3)
 
