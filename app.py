@@ -41,22 +41,34 @@ cursor.execute("""
 """)
 conn.commit()
 
-# 🔹 Respuestas rápidas
-FAQS = {
-    "horarios": "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
-    "reservas": "🔹 Reserva tu clase aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
-    "precios": "💰 Consulta precios y membresías aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-    "direccion": if "ubicación" in incoming_msg.lower():
-    msg.body("📍 Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. ¡Te esperamos!"),
-    "telefono": if "teléfono" in incoming_msg.lower():
-    msg.body("📞 Nuestro número de contacto es +1 (863) 317-1646. ¡Llámanos si necesitas más información!"),
-    "pagina web": if "sitio web" in incoming_msg.lower():
-        msg.body("🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneic.com"),
-    "reservar": if "reservar clase" in incoming_msg.lower():
-        msg.body("¡Claro! Estoy procesando tu reserva...")
-        respuesta = reservar_clase()
-        msg.body(respuesta)    
-}
+# Respuestas rápidas
+incoming_msg = incoming_msg.lower()  # Convierte el mensaje a minúsculas para evitar errores
+
+if "horarios" in incoming_msg:
+    respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
+elif "reservas" in incoming_msg:
+    respuesta = "📝 Reserva tu clase aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
+elif "precios" in incoming_msg:
+    respuesta = "💲 Consulta precios y membresías aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships"
+elif "ubicación" in incoming_msg or "direccion" in incoming_msg:
+    respuesta = "📍 Estamos ubicados en 2175 Davenport Blvd, Davenport FL 33837. ¡Te esperamos!"
+elif "teléfono" in incoming_msg or "contacto" in incoming_msg:
+    respuesta = "📞 Nuestro número de contacto es +1 (863) 317-1646. Llámanos si necesitas más información."
+elif "sitio web" in incoming_msg or "página web" in incoming_msg:
+    respuesta = "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com"
+elif "reservar clase" in incoming_msg:
+    respuesta = "¡Claro! Estoy procesando tu reserva..."
+    msg.body(respuesta)  # ✅ Enviar mensaje de confirmación al usuario
+    # Llamar a la función de reserva si existe
+    if "reservar_clase" in globals():  # Verifica si la función existe
+        reservar_clase()
+else:
+    respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
+
+msg.body(respuesta)  # Envía la respuesta al usuario
+
+
+
 
 @app.route("/", methods=["GET"])
 def home():
