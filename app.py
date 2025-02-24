@@ -161,8 +161,8 @@ def reservar_clase():
         # Conectar Selenium con Browserless
         driver = webdriver.Remote(
             command_executor=browserless_url,
-            desired_capabilities=options.to_capabilities()
-        )
+            options=options
+    )
 
 
 
