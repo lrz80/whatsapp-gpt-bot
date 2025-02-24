@@ -100,16 +100,18 @@ def whatsapp_reply():
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
     historial += [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
     historial.append({"role": "user", "content": incoming_msg})
-
+    
     try:
-	    client_openai = openai.OpenAI(api_key=OPENAI_API_KEY)
+        # Configurar cliente de OpenAI correctamente
+        client_openai = openai.Client(api_key=OPENAI_API_KEY)
 
-    	respuesta_ai = client_openai.chat.completions.create(
+        # Generar respuesta de OpenAI
+        respuesta_ai = client_openai.chat.completions.create(
             model="gpt-4",
             messages=historial
         )
 
-        # ✅ Acceder correctamente al contenido de la respuesta
+        # Acceder correctamente al contenido de la respuesta
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
         # Guardar mensaje y respuesta en SQLite
