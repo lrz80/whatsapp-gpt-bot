@@ -3,8 +3,13 @@ import subprocess
 
 def install_chrome_and_driver():
     try:
-        # 🔹 Actualizar paquetes e instalar dependencias necesarias antes de instalar Chrome
+        print("🚀 Instalando dependencias necesarias para Chrome...")
+
+        # 🔹 Instalar bibliotecas faltantes
         subprocess.run("apt-get update && apt-get install -y libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6", shell=True, check=True)
+
+        # 🔹 Instalar GLIBC compatible
+        subprocess.run("apt-get install -y libc6", shell=True, check=True)
 
         # 🔹 Descargar e instalar Google Chrome
         subprocess.run("curl -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", shell=True, check=True)
