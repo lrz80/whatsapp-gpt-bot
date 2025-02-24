@@ -89,8 +89,10 @@ def whatsapp_reply():
         msg.body(respuesta_texto)
 
         # 🔹 Si el usuario menciona "reservar clase", iniciar Selenium
-        if "reservar clase" in incoming_msg:
-            reservar_clase()
+        if "reservar clase" in incoming_msg.lower():
+            respuesta = reservar_clase()
+            msg.body(respuesta)
+            return str(resp)
 
     except Exception as e:
         print(f"❌ ERROR: {e}")
