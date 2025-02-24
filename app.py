@@ -164,7 +164,7 @@ def reservar_clase():
         print(f"❌ ERROR AL RESERVAR: {e}")  
         driver.quit()  # Asegurar cierre del navegador en caso de error
         return f"❌ Error al reservar: {e}"
-
+    
 if __name__ == "__main__":
     from waitress import serve
     PORT = int(os.environ.get("PORT", 5000))
