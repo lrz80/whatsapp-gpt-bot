@@ -52,6 +52,7 @@ def whatsapp_reply():
     from_number = request.values.get("From", "").strip()
     resp = MessagingResponse()
     msg = resp.message()
+    respuesta = "Error: No se pudo procesar la solicitud."  # Definir valor inicial
 
     # 🔹 Respuestas rápidas
     incoming_msg = request.values.get("Body", "").strip().lower()
@@ -70,7 +71,7 @@ def whatsapp_reply():
     elif "reservar clase" in incoming_msg:
         respuesta = "¡Claro! Estoy procesando tu reserva..."
     if "reservar_clase" in globals():  # Verifica si la función existe
-        reservar_clase()  
+        respuesta = reservar_clase()  
     elif "hola" in incoming_msg or "buenas" in incoming_msg:
         respuesta = "¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?"
     # Aquí puedes llamar a la función de reserva si es necesario
@@ -121,6 +122,7 @@ def reservar_clase():
     try:
         # Asegurar que la API Key esté bien configurada
         browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
+        print(f"Browserless URL: {browserless_url}"),
 
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")  # Modo sin interfaz gráfica
@@ -134,37 +136,34 @@ def reservar_clase():
             options=options
         )
 
-
-
-        # 🔹 Abrir Glofox
+        # ✅ Abrir Glofox
         driver.get("https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view")
         time.sleep(3)
 
-        # 🔹 Hacer clic en "Login/Register"
-        driver.find_element(By.CSS_SELECTOR, "body > div.container > div:nth-child(2) > div > div > ul.header-options > li:nth-child(2)").click()
-        time.sleep(2)
-
-        # 🔹 Iniciar sesión (modificar con credenciales de prueba)
+        # ✅ Hacer clic en "Login/Register"
         driver.find_element(By.CSS_SELECTOR, "#login-register-modal input").send_keys("luisamazon80@gmail.com")
         driver.find_element(By.CSS_SELECTOR, "#login-register-modal input[type='password']").send_keys("L.r14066719")
         driver.find_element(By.CSS_SELECTOR, "#login-register-modal button").click()
         time.sleep(3)
 
-        # 🔹 Comprar crédito gratuito
-        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div:nth-child(4) > div.col.s12.m7.push-m1.col-padding > div > ul > li > button").click()
+        # ✅ Comprar crédito gratuito (si aplica)
+        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div:nth-child(4) > div.col.s12.m7.push-m1...").click()
         time.sleep(2)
 
-        # 🔹 Seleccionar fecha y hora de clase
-        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div > div.slider > div.slider-wrapper > ul > li:nth-child(4) > span").click()
+        # ✅ Seleccionar fecha y hora de clase
+        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div.slider > div.slider-wrapper > ul...").click()
         time.sleep(2)
         driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div > ul > li:nth-child(1) > button").click()
         time.sleep(2)
 
         print("✅ Reserva completada con éxito")
-        driver.quit()
-
+        driver.quit()  # Siempre cerrar el navegador
+        return "✅ Tu clase ha sido reservada con éxito."
+    
     except Exception as e:
-        print(f"❌ ERROR AL RESERVAR: {e}")
+        print(f"❌ ERROR AL RESERVAR: {e}")  
+        driver.quit()  # Asegurar cierre del navegador en caso de error
+        return f"❌ Error al reservar: {e}"
 
 if __name__ == "__main__":
     from waitress import serve
