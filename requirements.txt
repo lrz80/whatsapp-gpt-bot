@@ -3,4 +3,4 @@ twilio
 openai==1.64.0
 waitress
 selenium==4.29.0 
- 
+webdriver-manager 
