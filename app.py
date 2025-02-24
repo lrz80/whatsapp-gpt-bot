@@ -3,11 +3,14 @@ import subprocess
 
 def install_chrome_and_driver():
     try:
-        # Descargar e instalar Google Chrome usando curl en vez de wget
+        # 🔹 Actualizar paquetes e instalar dependencias necesarias antes de instalar Chrome
+        subprocess.run("apt-get update && apt-get install -y libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6", shell=True, check=True)
+
+        # 🔹 Descargar e instalar Google Chrome
         subprocess.run("curl -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", shell=True, check=True)
         subprocess.run("dpkg -i /tmp/chrome.deb || apt-get -fy install", shell=True, check=True)
 
-        # Descargar e instalar ChromeDriver usando curl
+        # 🔹 Descargar e instalar ChromeDriver
         subprocess.run("curl -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip", shell=True, check=True)
         subprocess.run("unzip /tmp/chromedriver.zip -d /usr/bin/", shell=True, check=True)
         subprocess.run("chmod +x /usr/bin/chromedriver", shell=True, check=True)
