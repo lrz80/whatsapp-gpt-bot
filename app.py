@@ -1,4 +1,35 @@
 import os
+import subprocess
+
+def install_chrome_and_driver():
+    try:
+        print("🚀 Instalando Chrome y ChromeDriver...")
+
+        # Instalar dependencias necesarias
+        subprocess.run("apt-get update && apt-get install -y wget curl unzip", shell=True, check=True)
+        subprocess.run("apt-get install -y libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxfixes3 libxi6 libxrandr2 libxrender1", shell=True, check=True)
+
+        # Descargar e instalar Google Chrome
+        subprocess.run("curl -o /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", shell=True, check=True)
+        subprocess.run("dpkg -i /tmp/chrome.deb || apt-get -fy install", shell=True, check=True)
+
+        # Obtener la versión correcta de ChromeDriver
+        chrome_version = subprocess.check_output("google-chrome --version | awk '{print $3}'", shell=True).decode("utf-8").strip()
+        chromedriver_version = subprocess.check_output(f"curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{chrome_version}", shell=True).decode("utf-8").strip()
+
+        # Descargar e instalar ChromeDriver
+        subprocess.run(f"curl -o /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_linux64.zip", shell=True, check=True)
+        subprocess.run("unzip /tmp/chromedriver.zip -d /usr/bin/", shell=True, check=True)
+        subprocess.run("chmod +x /usr/bin/chromedriver", shell=True, check=True)
+
+        print("✅ Chrome y ChromeDriver instalados correctamente.")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error instalando Chrome/ChromeDriver: {e}")
+
+# Ejecutar instalación solo en Railway
+if __name__ == "__main__":
+    install_chrome_and_driver()
+
 import time
 import openai
 import sqlite3
@@ -119,10 +150,13 @@ def whatsapp_reply():
 def reservar_clase():
     try:
         # Configurar WebDriver
-        service = Service("/usr/bin/chromedriver")  # Usa la ruta correcta en Railway
+        service = Service("/usr/bin/chromedriver")  # Ruta correcta en Railway
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")  # Modo sin interfaz gráfica
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
         driver = webdriver.Chrome(service=service, options=options)
+
 
 
         # 🔹 Abrir Glofox
