@@ -3,26 +3,22 @@ import subprocess
 
 def install_chrome_and_driver():
     try:
-        # Instalar Google Chrome
-        subprocess.run("apt-get update && apt-get install -y google-chrome-stable", shell=True, check=True)
-
-        # Obtener la versión de Chrome instalada
-        chrome_version = subprocess.run("google-chrome --version | awk '{print $3}' | cut -d. -f1", 
-                                        shell=True, capture_output=True, text=True).stdout.strip()
-
-        # Descargar la versión correcta de ChromeDriver
-        chromedriver_url = f"https://chromedriver.storage.googleapis.com/{chrome_version}.0.5735.90/chromedriver_linux64.zip"
-        subprocess.run(f"wget {chromedriver_url} -O chromedriver.zip", shell=True, check=True)
-        subprocess.run("unzip chromedriver.zip", shell=True, check=True)
-        subprocess.run("mv chromedriver /usr/bin/chromedriver", shell=True, check=True)
+        # Descargar e instalar Google Chrome
+        subprocess.run("wget -q -O /tmp/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb", shell=True, check=True)
+        subprocess.run("dpkg -i /tmp/chrome.deb || apt-get -fy install", shell=True, check=True)
+        
+        # Descargar e instalar ChromeDriver
+        subprocess.run("wget -q -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_linux64.zip", shell=True, check=True)
+        subprocess.run("unzip /tmp/chromedriver.zip -d /usr/bin/", shell=True, check=True)
         subprocess.run("chmod +x /usr/bin/chromedriver", shell=True, check=True)
 
         print("✅ Chrome y ChromeDriver instalados correctamente.")
     except subprocess.CalledProcessError as e:
         print(f"❌ Error instalando Chrome/ChromeDriver: {e}")
 
-# Llamar la función antes de iniciar el bot
+# Ejecutar instalación
 install_chrome_and_driver()
+
 import time
 import openai
 import sqlite3
@@ -35,14 +31,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service
 
 chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument("--headless")  # Ejecutar sin interfaz gráfica
-chrome_options.add_argument("--no-sandbox")  # Necesario para entornos sin interfaz gráfica
-chrome_options.add_argument("--disable-dev-shm-usage")  # Evita problemas de memoria en contenedores
+chrome_options.add_argument("--headless")  # Modo sin interfaz
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
 
-# Configurar ChromeDriver con la instalación correcta
-service = Service("/usr/bin/chromedriver")
+# Ajustar servicio con el camino correcto de ChromeDriver
+service = webdriver.chrome.service.Service("/usr/bin/chromedriver")
 driver = webdriver.Chrome(service=service, options=chrome_options)
-from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
 
