@@ -121,7 +121,7 @@ def whatsapp_reply():
 def reservar_clase():
     try:
         # Asegurar que la API Key esté bien configurada
-        browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
+        browserless_url = f"https://chrome.browserless.io?token={os.getenv('BROWSERLESS_API_KEY')}"
         print(f"Browserless URL: {browserless_url}"),
 
         options = webdriver.ChromeOptions()
