@@ -41,9 +41,18 @@ cursor.execute("""
 """)
 conn.commit()
 
-# Respuestas rápidas
-incoming_msg = request.values.get("Body", "").strip().lower()  # Definir y limpiar incoming_msg
+@app.route("/", methods=["GET"])
+def home():
+    return "¡Servidor funcionando correctamente en Railway!"
 
+@app.route("/webhook", methods=["POST"])
+def whatsapp_reply():
+    from_number = request.values.get("From", "").strip()
+    resp = MessagingResponse()
+    msg = resp.message()
+
+    # 🔹 Respuestas rápidas
+    incoming_msg = request.values.get("Body", "").strip().lower()
 if "horarios" in incoming_msg:
     respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
 elif "reservas" in incoming_msg:
@@ -69,25 +78,6 @@ else:
 
 msg.body(respuesta)  # Envía la respuesta al usuario
 
-
-
-
-@app.route("/", methods=["GET"])
-def home():
-    return "¡Servidor funcionando correctamente en Railway!"
-
-@app.route("/webhook", methods=["POST"])
-def whatsapp_reply():
-    from_number = request.values.get("From", "").strip()
-    incoming_msg = request.values.get("Body", "").strip().lower()
-    resp = MessagingResponse()
-    msg = resp.message()
-
-    # 🔹 Respuestas rápidas
-    for key, value in FAQS.items():
-        if key in incoming_msg:
-            msg.body(value)
-            return str(resp)
 
     # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
