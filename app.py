@@ -46,13 +46,13 @@ FAQS = {
     "horarios": "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
     "reservas": "🔹 Reserva tu clase aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
     "precios": "💰 Consulta precios y membresías aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-    "direccion": "if ubicación" in incoming_msg.lower():
-        msg.body("📍 Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. ¡Te esperamos!"),
-    "telefono": "if teléfono in incoming_msg.lower():
-        msg.body("📞 Puedes contactarnos al siguiente número: +18633171646"),
-    "pagina web": "if "sitio web" in incoming_msg.lower():
-        msg.body("🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneic.com")
-    "reservar": "if "reservar clase" in incoming_msg.lower():
+    "direccion": if "ubicación" in incoming_msg.lower():
+    msg.body("📍 Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. ¡Te esperamos!"),
+    "telefono": if "teléfono" in incoming_msg.lower():
+    msg.body("📞 Nuestro número de contacto es +1 (863) 317-1646. ¡Llámanos si necesitas más información!"),
+    "pagina web": if "sitio web" in incoming_msg.lower():
+        msg.body("🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneic.com"),
+    "reservar": if "reservar clase" in incoming_msg.lower():
         msg.body("¡Claro! Estoy procesando tu reserva...")
         respuesta = reservar_clase()
         msg.body(respuesta)"    
