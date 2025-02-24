@@ -102,7 +102,7 @@ def whatsapp_reply():
     historial.append({"role": "user", "content": incoming_msg})
     
     try:
-        # Configurar cliente de OpenAI correctamente
+        # Definir correctamente el cliente de OpenAI antes de usarlo
         client_openai = openai.Client(api_key=OPENAI_API_KEY)
 
         # Generar respuesta de OpenAI
@@ -111,10 +111,9 @@ def whatsapp_reply():
             messages=historial
         )
 
-        # Acceder correctamente al contenido de la respuesta
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
-        # Guardar mensaje y respuesta en SQLite
+        # Guardar en la base de datos
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
         conn.commit()
