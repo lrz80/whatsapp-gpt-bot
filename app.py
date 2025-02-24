@@ -67,13 +67,15 @@ def whatsapp_reply():
         respuesta = "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com"
     elif "reservar clase" in incoming_msg:
         respuesta = "¡Claro! Estoy procesando tu reserva..."
+    if "reservar_clase" in globals():  # Verifica si la función existe
+        reservar_clase()  
+    elif "hola" in incoming_msg or "buenas" in incoming_msg:
+        respuesta = "¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?"
     # Aquí puedes llamar a la función de reserva si es necesario
     else:
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
     msg.body(respuesta)  # Enviar la respuesta al usuario
-
-
 
     # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
@@ -89,7 +91,7 @@ def whatsapp_reply():
         # Verifica que el bot no diga que es una IA
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
         if "soy una inteligencia artificial" in respuesta_texto.lower():
-            respuesta_texto = "Bienvenido a SpinZone, ¿en qué puedo ayudarte?"
+            respuesta_texto = "Hola, ¿en qué puedo ayudarte?"
 
 
 
