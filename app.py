@@ -149,13 +149,20 @@ def whatsapp_reply():
 # 🔹 Automatización con Selenium para reservas en Glofox
 def reservar_clase():
     try:
-        # Configurar WebDriver
-        service = Service("/usr/bin/chromedriver")  # Ruta correcta en Railway
+        # Reemplaza "TU_API_KEY" con la API Key de Browserless
+        browserless_url = "wss://chrome.browserless.io?token=RpjC71GraniIGGbace2d072e1f4e476227bf2556b4"
+
         options = webdriver.ChromeOptions()
-        options.add_argument("--headless")  # Modo sin interfaz gráfica
+        options.add_argument("--headless")  # Ejecutar sin interfaz gráfica
+        options.add_argument("--disable-gpu")
         options.add_argument("--no-sandbox")
         options.add_argument("--disable-dev-shm-usage")
-        driver = webdriver.Chrome(service=service, options=options)
+
+        # Conectar Selenium con Browserless
+        driver = webdriver.Remote(
+            command_executor=browserless_url,
+            desired_capabilities=options.to_capabilities()
+        )
 
 
 
