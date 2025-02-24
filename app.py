@@ -1,14 +1,19 @@
 import os
-import sqlite3
+import time
 import openai
+import sqlite3
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
-from reservar_clase import reservar_clase
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 app = Flask(__name__)
 
-# Cargar variables de entorno
+# 🔹 Cargar variables de entorno
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
@@ -20,15 +25,12 @@ if OPENAI_API_KEY:
 else:
     raise ValueError("⚠️ ERROR: La clave de API de OpenAI no está configurada correctamente.")
 
-
-# Inicializar cliente de Twilio
 client_twilio = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-# Conectar con SQLite
+# 🔹 Conectar con SQLite
 conn = sqlite3.connect("chatbot.db", check_same_thread=False)
 cursor = conn.cursor()
 
-# Crear la tabla si no existe
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS conversaciones (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -38,6 +40,16 @@ cursor.execute("""
     )
 """)
 conn.commit()
+
+# 🔹 Respuestas rápidas
+FAQS = {
+    "horarios": "📅 Los horarios y reservas están aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
+    "reservas": "🔹 Reserva tu clase aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
+    "precios": "💰 Consulta precios y membresías aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
+    "direccion": "📍 Spinzone Indoorcycling está en 2175 Davenport Blvd Davenport Fl 33837. ¡Te esperamos!",
+    "telefono": "📞 Nuestro número es: +18633171646",
+    "pagina web": "🌐 Visítanos en: https://spinzoneic.com"
+}
 
 @app.route("/", methods=["GET"])
 def home():
@@ -50,30 +62,15 @@ def whatsapp_reply():
     resp = MessagingResponse()
     msg = resp.message()
 
-    # 📌 Respuestas específicas de Spinzone Indoorcycling
-    respuestas_rapidas = {
-        "horarios": "Puedes ver los horarios y hacer reservas aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
-        "reservas": "Para hacer una reserva, visita: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view",
-        "precios": "Los precios y planes de membresía los encuentras aquí: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/memberships",
-        "direccion": "Spinzone Indoorcycling está ubicado en **2175 Davenport Blvd Davenport Fl 33837**. ¡Te esperamos!",
-        "telefono": "Puedes contactarnos al **+18633171646**.",
-        "pagina web": "Visita nuestra página web aquí: **www.spinzoneic.com**.",
-        "clases": "Consulta los horarios y disponibilidad de clases en: https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view"
-    }
-
-    # 🔍 Revisar si el mensaje es una pregunta frecuente
-    for key, value in respuestas_rapidas.items():
+    # 🔹 Respuestas rápidas
+    for key, value in FAQS.items():
         if key in incoming_msg:
             msg.body(value)
             return str(resp)
 
-    # 👇 Si el mensaje no está en las preguntas frecuentes, usa OpenAI
-    historial = [
-        {"role": "system", "content": "Eres el asistente virtual de Spinzone Indoorcycling. Tu trabajo es responder preguntas sobre la empresa, incluyendo dirección, teléfono, página web, precios y reservas. No menciones que eres una IA. Siempre responde con información útil y clara."}
-    ]
-
+    # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
-    historial += [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
+    historial = [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
     historial.append({"role": "user", "content": incoming_msg})
 
     try:
@@ -83,14 +80,15 @@ def whatsapp_reply():
         )
         respuesta_texto = respuesta_ai.choices[0].message.content.strip()
 
-        # Guardar mensaje y respuesta en SQLite
+
+        # Guardar en la base de datos
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
         cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
         conn.commit()
 
-        msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
+        msg.body(respuesta_texto)
 
-        # 👉 Si el usuario quiere reservar una clase, ejecutamos Selenium
+        # 🔹 Si el usuario menciona "reservar clase", iniciar Selenium
         if "reservar clase" in incoming_msg:
             reservar_clase()
 
@@ -100,40 +98,44 @@ def whatsapp_reply():
 
     return str(resp)
 
-    # Guardar historial en SQLite
-    cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
-    historial = [
-    {"role": "system", "content": "Eres el asistente virtual de Spinzone Indoorcycling. Responde preguntas sobre horarios, precios y reservas como si fueras parte del equipo de la empresa.       No menciones que eres una inteligencia artificial."}
-]
-
-    cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
-    historial += [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
-    historial.append({"role": "user", "content": incoming_msg})
-    
+# 🔹 Automatización con Selenium para reservas en Glofox
+def reservar_clase():
     try:
-        # Definir correctamente el cliente de OpenAI antes de usarlo
-        client_openai = openai.Client(api_key=OPENAI_API_KEY)
+        # Configurar WebDriver
+        service = Service(ChromeDriverManager().install())
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        driver = webdriver.Chrome(service=service, options=options)
 
-        # Generar respuesta de OpenAI
-        respuesta_ai = client_openai.chat.completions.create(
-            model="gpt-4",
-            messages=historial
-        )
+        # 🔹 Abrir Glofox
+        driver.get("https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view")
+        time.sleep(3)
 
-        respuesta_texto = respuesta_ai.choices[0].message.content.strip()
+        # 🔹 Hacer clic en "Login/Register"
+        driver.find_element(By.CSS_SELECTOR, "body > div.container > div:nth-child(2) > div > div > ul.header-options > li:nth-child(2)").click()
+        time.sleep(2)
 
-        # Guardar en la base de datos
-        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "user", incoming_msg))
-        cursor.execute("INSERT INTO conversaciones (user, role, content) VALUES (?, ?, ?)", (from_number, "assistant", respuesta_texto))
-        conn.commit()
+        # 🔹 Iniciar sesión (modificar con credenciales de prueba)
+        driver.find_element(By.CSS_SELECTOR, "#login-register-modal input").send_keys("correo@ejemplo.com")
+        driver.find_element(By.CSS_SELECTOR, "#login-register-modal input[type='password']").send_keys("TuContraseña")
+        driver.find_element(By.CSS_SELECTOR, "#login-register-modal button").click()
+        time.sleep(3)
 
-        msg.body(respuesta_texto)  # Enviar respuesta a WhatsApp
+        # 🔹 Comprar crédito gratuito
+        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div:nth-child(4) > div.col.s12.m7.push-m1.col-padding > div > ul > li > button").click()
+        time.sleep(2)
+
+        # 🔹 Seleccionar fecha y hora de clase
+        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div > div.slider > div.slider-wrapper > ul > li:nth-child(4) > span").click()
+        time.sleep(2)
+        driver.find_element(By.CSS_SELECTOR, "body > div.container > div.ng-scope > div > ul > li:nth-child(1) > button").click()
+        time.sleep(2)
+
+        print("✅ Reserva completada con éxito")
+        driver.quit()
 
     except Exception as e:
-        print(f"❌ ERROR: {e}")
-        msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
-
-    return str(resp)
+        print(f"❌ ERROR AL RESERVAR: {e}")
 
 if __name__ == "__main__":
     from waitress import serve
