@@ -123,6 +123,7 @@ def reservar_clase():
     try:
         driver = None  # Definir la variable driver antes del try
 
+        chrome_options = Options()
         options = webdriver.ChromeOptions()
         options.binary_location = "/usr/bin/chromium"
         options.add_argument("--headless")  # Modo sin interfaz gráfica
@@ -131,7 +132,7 @@ def reservar_clase():
 
         # 🔹 Asegurar que usa Google Chrome en lugar de Chromium
         chrome_options.binary_location = "/usr/bin/google-chrome"
-        
+
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
 
