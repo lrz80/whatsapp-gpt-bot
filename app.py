@@ -124,12 +124,12 @@ def reservar_clase():
         driver = None  # Definir la variable driver antes del try
 
         # Configurar opciones de Chrome
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument("--headless")  # Modo sin interfaz gráfica
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
-        # Descargar e inicializar ChromeDriver automáticamente
+        # Instalar y configurar ChromeDriver automáticamente
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
 

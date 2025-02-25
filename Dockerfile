@@ -5,13 +5,6 @@ RUN apt-get update && apt-get install -y \
     curl wget unzip chromium \
     && rm -rf /var/lib/apt/lists/*
 
-# Descargar e instalar ChromeDriver manualmente
-RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip" -O /tmp/chromedriver.zip \
-    && unzip /tmp/chromedriver.zip -d /tmp/ \
-    && mv /tmp/chromedriver-linux64/chromedriver /usr/local/bin/chromedriver \
-    && chmod +x /usr/local/bin/chromedriver \
-    && rm -rf /tmp/chromedriver*
-
 # Instalar librerías de Python
 RUN pip install --no-cache-dir selenium flask
 RUN pip install --no-cache-dir selenium flask requests
