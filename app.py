@@ -57,10 +57,13 @@ def whatsapp_reply():
 
     # 🔹 Respuestas rápidas
     incoming_msg = request.values.get("Body", "").strip().lower()
+    print(f"Mensaje recibido: {incoming_msg}")
+
     if "horarios" in incoming_msg:
         respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/..."
-    elif "reservas" in incoming_msg:
+    if "reserva" in incoming_msg.strip().lower():
         respuesta = "🎟 Reserva tu clase aquí: https://app.glofox.com/..."
+        print(f"Mensaje procesado: '{incoming_msg}'")
     elif "precios" in incoming_msg:
         respuesta = "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."
     elif "ubicación" in incoming_msg or "dirección" in incoming_msg:
@@ -80,6 +83,7 @@ def whatsapp_reply():
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
     msg.body(respuesta)  # Enviar la respuesta al usuario
+    print(f"Respuesta enviada: {respuesta}")
 
     # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
