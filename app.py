@@ -57,11 +57,12 @@ def whatsapp_reply():
 
     # 🔹 Respuestas rápidas
     incoming_msg = request.values.get("Body", "").strip().lower()
-    print(f"Mensaje recibido: {incoming_msg}")
+    print(f"Mensaje recibido: {incoming_msg}")  # Verifica si el mensaje se está recibiendo
+
 
     if "horarios" in incoming_msg:
         respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/..."
-    if "reserva" in incoming_msg.strip().lower():
+    elif "reserva" in incoming_msg.strip().lower():
         respuesta = "🎟 Reserva tu clase aquí: https://app.glofox.com/..."
         print(f"Mensaje procesado: '{incoming_msg}'")
     elif "precios" in incoming_msg:
@@ -74,7 +75,7 @@ def whatsapp_reply():
         respuesta = "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com"
     elif "reservar clase" in incoming_msg:
         respuesta = "¡Claro! Estoy procesando tu reserva..."
-    if "reservar_clase" in globals():  # Verifica si la función existe
+    elif "reservar_clase" in globals():  # Verifica si la función existe
         respuesta = reservar_clase()  
     elif "hola" in incoming_msg or "buenas" in incoming_msg:
         respuesta = "¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?"
@@ -84,6 +85,8 @@ def whatsapp_reply():
 
     msg.body(respuesta)  # Enviar la respuesta al usuario
     print(f"Respuesta enviada: {respuesta}")
+
+    return jsonify({"status": "success", "message": respuesta}), 200
 
     # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
