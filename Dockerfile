@@ -1,28 +1,23 @@
-FROM python:3.10-slim
+# Usa una imagen base de Python (o la que estés usando)
+FROM python:3.10
 
-# Instalar dependencias necesarias
+# Instala wget y unzip antes de descargar ChromeDriver
+RUN apt-get update && apt-get install -y wget unzip
+
+# Descarga y configura ChromeDriver
 RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip" \
     -O /tmp/chromedriver.zip && unzip /tmp/chromedriver.zip -d /usr/local/bin/ && chmod +x /usr/local/bin/chromedriver && rm /tmp/chromedriver.zip
 
+# Continúa con la instalación de dependencias y el código
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-# Instalar librerías de Python
-RUN pip install --no-cache-dir selenium flask
-RUN pip install --no-cache-dir selenium flask requests
-RUN pip install --no-cache-dir selenium flask requests openai
-RUN pip install --no-cache-dir selenium flask requests openai twilio
-RUN pip install --no-cache-dir selenium flask requests openai twilio waitress
-RUN pip install --no-cache-dir selenium flask requests openai twilio webdriver-manager
-
-# Configurar variables de entorno
-ENV PATH="/usr/lib/chromium/:${PATH}"
-ENV CHROMIUM_PATH="/usr/bin/chromium"
-
-# Copiar el código del proyecto
-WORKDIR /app
+# Copia el código de la aplicación
 COPY . .
 
-# Ejecutar el bot
+# Ejecuta la aplicación
 CMD ["python", "app.py"]
+
 
 
 
