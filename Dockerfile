@@ -1,9 +1,9 @@
 FROM python:3.10-slim
 
 # Instalar dependencias necesarias
-RUN apt-get update && apt-get install -y \
-    curl wget unzip chromium \
-    && rm -rf /var/lib/apt/lists/*
+RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip" \
+    -O /tmp/chromedriver.zip && unzip /tmp/chromedriver.zip -d /usr/local/bin/ && chmod +x /usr/local/bin/chromedriver && rm /tmp/chromedriver.zip
+
 
 # Instalar librerías de Python
 RUN pip install --no-cache-dir selenium flask
