@@ -4,3 +4,4 @@ twilio
 openai
 waitress
 requests
+webdriver-manager
