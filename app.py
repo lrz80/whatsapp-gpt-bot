@@ -131,9 +131,6 @@ def reservar_clase():
 
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")  # Modo sin interfaz gráfica
-        options.add_argument("--disable-gpu")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
 
         print("Conectando con Browserless en:", browserless_url)
 
