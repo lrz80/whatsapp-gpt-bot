@@ -124,7 +124,7 @@ def reservar_clase():
 
         # Asegurar que la API Key esté bien configurada
         browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
-        print(f"Browserless URL: {browserless_url}"),
+        print("Browserless URL:", browserless_url)  # Agrega esta línea para depuración
 
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")  # Modo sin interfaz gráfica
