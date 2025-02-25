@@ -14,6 +14,7 @@ RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943
 
 # Instalar librerías de Python
 RUN pip install --no-cache-dir selenium flask
+RUN pip install --no-cache-dir selenium flask requests
 
 # Configurar variables de entorno
 ENV PATH="/usr/lib/chromium/:${PATH}"
