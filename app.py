@@ -1,5 +1,6 @@
 import os
 import subprocess
+import requests
 import time
 import openai
 import sqlite3
