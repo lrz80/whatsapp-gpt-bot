@@ -124,7 +124,9 @@ def reservar_clase():
 
         # Asegurar que la API Key esté bien configurada
         browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
-        print("Browserless URL:", browserless_url)  # Agrega esta línea para depuración
+       
+        # 📌 Imprimir la URL en los logs para verificar si es correcta
+        print(f"Conectando con Browserless en: {browserless_url}")
 
         options = webdriver.ChromeOptions()
         options.add_argument("--headless")  # Modo sin interfaz gráfica
@@ -134,6 +136,14 @@ def reservar_clase():
 
         print("Conectando con Browserless en:", browserless_url)
 
+        # Hacer una solicitud GET a Browserless para probar la API Key
+        response = requests.get(browserless_url)
+        print("Respuesta de Browserless:", response.status_code, response.text)
+
+        # Si Browserless no responde correctamente, detener la ejecución
+        if response.status_code != 200:
+            raise Exception("🚨 Error: Browserless no está funcionando correctamente. Verifica tu API Key o plan.")
+        
         driver = webdriver.Remote(command_executor=browserless_url, options=options)
 
         # Verificar si driver se creó correctamente
