@@ -1,8 +1,8 @@
 # Usa una imagen base de Python (o la que estés usando)
 FROM python:3.10
 
-# Instala wget y unzip antes de descargar ChromeDriver
-RUN apt-get update && apt-get install -y wget unzip
+# Instalar Chromium en el contenedor
+RUN apt-get update && apt-get install -y chromium-browser
 
 # Descarga y configura ChromeDriver
 RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip" \
