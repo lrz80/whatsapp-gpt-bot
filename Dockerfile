@@ -12,6 +12,22 @@ RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943
     chmod +x /usr/local/bin/chromedriver && \
     rm -rf /tmp/chromedriver.zip /usr/local/bin/chromedriver-linux64
 
+# Instalar dependencias necesarias para Chrome y ChromeDriver
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    unzip \
+    libglib2.0-0 \
+    libnss3 \
+    libgconf-2-4 \
+    libfontconfig1 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libdbus-glib-1-2 \
+    libgtk-3-0 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Continúa con la instalación de dependencias y el código
 COPY requirements.txt .
 RUN pip install -r requirements.txt
