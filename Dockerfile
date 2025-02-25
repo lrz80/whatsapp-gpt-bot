@@ -1,12 +1,20 @@
 # Usa una imagen base de Python
 FROM python:3.10-slim
 
-# Instalar dependencias necesarias
+# Instalar dependencias
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     curl \
-    chromium
+    chromium \
+    && rm -rf /var/lib/apt/lists/*
+
+# Instalar ChromeDriver compatible con Chromium 133
+RUN wget -q "https://chromedriver.storage.googleapis.com/133.0.6943.126/chromedriver_linux64.zip" -O /tmp/chromedriver.zip \
+    && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
+    && chmod +x /usr/local/bin/chromedriver \
+    && rm /tmp/chromedriver.zip
+
 
 # Definir variables de entorno para Selenium y Chrome
 ENV CHROME_BIN=/usr/bin/chromium
