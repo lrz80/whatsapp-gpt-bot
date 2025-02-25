@@ -123,30 +123,14 @@ def reservar_clase():
     try:
         driver = None  # Definir la variable driver antes del try
 
-        # Asegurar que la API Key esté bien configurada
-        browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
-       
-        # 📌 Imprimir la URL en los logs para verificar si es correcta
-        print(f"Conectando con Browserless en: {browserless_url}")
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")  # Sin interfaz gráfica
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
 
-        options = webdriver.ChromeOptions()
-        options.add_argument("--headless")  # Modo sin interfaz gráfica
-
-        print("Conectando con Browserless en:", browserless_url)
-
-        # Hacer una solicitud GET a Browserless para probar la API Key
-        response = requests.get(browserless_url)
-        print("Respuesta de Browserless:", response.status_code, response.text)
-
-        # Si Browserless no responde correctamente, detener la ejecución
-        if response.status_code != 200:
-            raise Exception("🚨 Error: Browserless no está funcionando correctamente. Verifica tu API Key o plan.")
-        
-        driver = webdriver.Remote(
-            command_executor="https://chrome.browserless.io/webdriver?token=RpjC71GraniIGG76aa6ecec8d091197b4de09d1189",
-            options=options
-        )
-
+        # Configurar ChromeDriver en Railway
+        service = Service("/usr/local/bin/chromedriver")
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         # Verificar si driver se creó correctamente
         if driver is None:
             raise Exception("Error al inicializar el WebDriver")

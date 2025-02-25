@@ -1,6 +1,6 @@
-flask
+Flask
+selenium
 twilio
-openai==1.64.0
+openai
 waitress
-selenium==4.29.0 
-webdriver-manager 
+requests
