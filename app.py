@@ -142,7 +142,10 @@ def reservar_clase():
         if response.status_code != 200:
             raise Exception("🚨 Error: Browserless no está funcionando correctamente. Verifica tu API Key o plan.")
         
-        driver = webdriver.Remote(command_executor=browserless_url, options=options)
+        driver = webdriver.Remote(
+            command_executor="https://chrome.browserless.io/webdriver?token=RpjC71GraniIGG76aa6ecec8d091197b4de09d1189",
+            options=options
+        )
 
         # Verificar si driver se creó correctamente
         if driver is None:
