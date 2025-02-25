@@ -17,6 +17,7 @@ RUN pip install --no-cache-dir selenium flask
 RUN pip install --no-cache-dir selenium flask requests
 RUN pip install --no-cache-dir selenium flask requests openai
 RUN pip install --no-cache-dir selenium flask requests openai twilio
+RUN pip install --no-cache-dir selenium flask requests openai twilio webdriver-manager
 
 # Configurar variables de entorno
 ENV PATH="/usr/lib/chromium/:${PATH}"
