@@ -124,7 +124,7 @@ def reservar_clase():
         driver = None  # Definir la variable driver antes del try
 
         # Detectar la versión correcta de Chrome en el sistema
-        chrome_driver_path = ChromeDriverManager(version="114").install()  # 👈 Fuerza la versión compatible
+        chrome_driver_path = ChromeDriverManager().install()
 
         # Configurar opciones de Chrome
         chrome_options = Options()
