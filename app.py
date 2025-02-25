@@ -123,17 +123,19 @@ def reservar_clase():
     try:
         driver = None  # Definir la variable driver antes del try
 
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")  # Sin interfaz gráfica
+        # Configurar opciones de Chrome
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument("--headless")  # Modo sin interfaz gráfica
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
-        # Configurar ChromeDriver en Railway
-        service = Service("/usr/local/bin/chromedriver")
+        # Descargar e inicializar ChromeDriver automáticamente
+        service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
-        # Verificar si driver se creó correctamente
-        if driver is None:
-            raise Exception("Error al inicializar el WebDriver")
+
+        # Prueba accediendo a Google
+        driver.get("https://www.google.com")
+        print("Título de la página:", driver.title)
 
         # ✅ Abrir Glofox
         driver.get("https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view")
