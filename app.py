@@ -129,6 +129,9 @@ def reservar_clase():
         options.add_argument("--no-sandbox")  # Evita restricciones en Railway
         options.add_argument("--disable-dev-shm-usage")  # Evita problemas de memoria
 
+        # 🔹 Asegurar que usa Google Chrome en lugar de Chromium
+        chrome_options.binary_location = "/usr/bin/google-chrome"
+        
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
 

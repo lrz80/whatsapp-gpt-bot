@@ -4,9 +4,10 @@ FROM python:3.10
 # Instalar dependencias
 RUN apt-get update && apt-get install -y wget curl unzip
 
-# Descargar e instalar la versión más reciente de Chromium
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+# Instalar Google Chrome en lugar de Chromium
+RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor > /usr/share/keyrings/google-keyring.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/google-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+RUN apt-get update && apt-get install -y google-chrome-stable
 
 # Continúa con la instalación de dependencias y el código
 COPY requirements.txt .
