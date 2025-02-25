@@ -16,6 +16,7 @@ RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943
 RUN pip install --no-cache-dir selenium flask
 RUN pip install --no-cache-dir selenium flask requests
 RUN pip install --no-cache-dir selenium flask requests openai
+RUN pip install --no-cache-dir selenium flask requests openai twilio
 
 # Configurar variables de entorno
 ENV PATH="/usr/lib/chromium/:${PATH}"
