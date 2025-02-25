@@ -120,10 +120,10 @@ def whatsapp_reply():
 # 🔹 Automatización con Selenium para reservas en Glofox
 def reservar_clase():
     try:
-        driver = None  # Inicializa el driver como None
+        driver = None  # Definir la variable driver antes del try
 
         # Asegurar que la API Key esté bien configurada
-        browserless_url = f"https://chrome.browserless.io?token={os.getenv('BROWSERLESS_API_KEY')}"
+        browserless_url = f"https://chrome.browserless.io/webdriver?token={os.getenv('BROWSERLESS_API_KEY')}"
         print(f"Browserless URL: {browserless_url}"),
 
         options = webdriver.ChromeOptions()
