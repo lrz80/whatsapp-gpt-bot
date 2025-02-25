@@ -12,7 +12,7 @@ RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943
     chmod +x /usr/local/bin/chromedriver && \
     rm -rf /tmp/chromedriver.zip /usr/local/bin/chromedriver-linux64
 
-# Instalar dependencias necesarias para Chrome y ChromeDriver
+# Instalar Google Chrome estable
 RUN apt-get update && apt-get install -y \
     wget \
     curl \
@@ -26,7 +26,11 @@ RUN apt-get update && apt-get install -y \
     libxi6 \
     libdbus-glib-1-2 \
     libgtk-3-0 \
+    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+    && apt-get update && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Continúa con la instalación de dependencias y el código
 COPY requirements.txt .
