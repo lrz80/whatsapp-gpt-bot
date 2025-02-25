@@ -1,33 +1,28 @@
-# Usa una imagen base de Python
 FROM python:3.10-slim
 
 # Instalar dependencias
 RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    curl \
-    chromium \
+    curl unzip chromium \
     && rm -rf /var/lib/apt/lists/*
 
-# Instalar ChromeDriver compatible con Chromium 133
-RUN wget -q "https://chromedriver.storage.googleapis.com/133.0.6943.126/chromedriver_linux64.zip" -O /tmp/chromedriver.zip \
+# Descargar e instalar ChromeDriver manualmente
+RUN wget -q "https://storage.googleapis.com/chrome-for-testing-public/133.0.6943.126/linux64/chromedriver-linux64.zip" -O /tmp/chromedriver.zip \
     && unzip /tmp/chromedriver.zip -d /usr/local/bin/ \
     && chmod +x /usr/local/bin/chromedriver \
     && rm /tmp/chromedriver.zip
 
+# Instalar librerías de Python
+RUN pip install --no-cache-dir selenium flask
 
-# Definir variables de entorno para Selenium y Chrome
-ENV CHROME_BIN=/usr/bin/chromium
-ENV PATH="/root/.local/bin:$PATH"
+# Configurar variables de entorno
+ENV PATH="/usr/lib/chromium/:${PATH}"
+ENV CHROMIUM_PATH="/usr/bin/chromium"
 
-# Instalar WebDriver Manager y dependencias de Python
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copiar el código fuente
+# Copiar el código del proyecto
+WORKDIR /app
 COPY . .
 
-# Comando para ejecutar la aplicación
+# Ejecutar el bot
 CMD ["python", "app.py"]
 
 
