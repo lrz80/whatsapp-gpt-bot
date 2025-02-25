@@ -123,14 +123,17 @@ def reservar_clase():
     try:
         driver = None  # Definir la variable driver antes del try
 
+        # Detectar la versión correcta de Chrome en el sistema
+        chrome_driver_path = ChromeDriverManager(version="114").install()  # 👈 Fuerza la versión compatible
+
         # Configurar opciones de Chrome
         chrome_options = Options()
-        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--headless")  # Modo sin interfaz gráfica
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
-        # Instalar y configurar ChromeDriver automáticamente
-        service = Service(ChromeDriverManager().install())
+        # Iniciar el WebDriver con la versión correcta
+        service = Service(chrome_driver_path)
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # Prueba accediendo a Google
