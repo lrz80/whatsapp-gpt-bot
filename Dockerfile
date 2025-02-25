@@ -1,8 +1,8 @@
 FROM python:3.10-slim
 
-# Instalar dependencias
+# Instalar dependencias necesarias
 RUN apt-get update && apt-get install -y \
-    curl unzip chromium \
+    curl wget unzip chromium \
     && rm -rf /var/lib/apt/lists/*
 
 # Descargar e instalar ChromeDriver manualmente
@@ -24,5 +24,6 @@ COPY . .
 
 # Ejecutar el bot
 CMD ["python", "app.py"]
+
 
 
