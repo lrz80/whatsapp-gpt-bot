@@ -58,8 +58,8 @@ def whatsapp_reply():
 
     # 🔹 Respuestas rápidas
     incoming_msg = request.values.get("Body", "").strip().lower()
-    print(f"Mensaje recibido: {incoming_msg}")  # Verifica si el mensaje se está recibiendo
 
+    print(f"📩 Mensaje recibido: {incoming_msg}")
 
     if "horarios" in incoming_msg:
         respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/..."
@@ -84,6 +84,8 @@ def whatsapp_reply():
     else:
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
+    print(f"🔄 Respuesta enviada: {respuesta}")
+    
     msg.body(respuesta)  # Enviar la respuesta al usuario
     print(f"Respuesta enviada: {respuesta}")
 
