@@ -20,6 +20,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from flask import jsonify
 import threading
 from flask import Response
+from reservar_clase import reservar_clase
 
 app = Flask(__name__)
 
@@ -61,39 +62,51 @@ def whatsapp_reply():
     incoming_msg = data.get("Body", "").strip().lower()
     from_number = data.get("From", "")
 
+    resp = MessagingResponse()  
+    msg = resp.message()  # Asegura que msg esté definido
+
     print(f"📩 Mensaje recibido: {incoming_msg} | 📞 De: {from_number}")
 
     respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
     # Enviar respuesta rápida antes de iniciar Selenium
     if "reservar" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         threading.Thread(target=reservar_clase, args=()).start()  # Inicia la reserva en segundo plano
         return jsonify({"status": "success", "message": "⏳ Procesando tu reserva..."}), 200
 
     # Respuestas rápidas
     if "horarios" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "🕒 Los horarios y reservas están aquí: https://app.glofox.com/..."}), 200
 
     if "precios" in incoming_msg or "planes" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."}), 200
 
     if "ubicación" in incoming_msg or "dirección" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "📍 Estamos ubicados en 2175 Davenport Blvd, Davenport FL 33837. ¡Te esperamos!..."}), 200
 
     if "teléfono" in incoming_msg or "contacto" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "📞 Nuestro número de contacto es +1 (863) 317-1646. Llámanos si necesitas más información..."}), 200
     
     if "sitio web" in incoming_msg or "página web" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com..."}), 200
     
     if "hola" in incoming_msg or "buenas" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": " ¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?..."}), 200
     
     elif "informacion" in incoming_msg or "más información" in incoming_msg:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."}), 200
 
     # Aquí puedes llamar a la función de reserva si es necesario
     else:
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
     # 🔹 Guardar historial de conversación
