@@ -132,7 +132,7 @@ def whatsapp_reply():
         print(f"❌ ERROR: {e}")
         msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
-    return jsonify({"status": "success", "message": respuesta}), 200
+    return str(resp)  # ⚠️ Twilio necesita que esto sea un string
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def whatsapp_reply():
