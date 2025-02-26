@@ -14,6 +14,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from flask import Flask, request, jsonify
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 app = Flask(__name__)
 
@@ -132,21 +134,30 @@ def whatsapp_reply():
 # 🔹 Automatización con Selenium para reservas en Glofox
 def reservar_clase():
     try:
-        driver = None  # Definir la variable driver antes del try
+        print("🔄 Iniciando Selenium...")
 
+        # Configurar Chrome en modo sin cabeza (headless)
         chrome_options = Options()
-        chrome_options.add_argument("--headless")  
+        chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.binary_location = "/usr/bin/google-chrome"  # Asegurar ubicación de Chrome
 
-        # 🔹 Define la ubicación correcta de Chrome
-        chrome_options.binary_location = "/usr/bin/google-chrome"
-
+        # Iniciar WebDriver con las opciones configuradas
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
-        driver.get("https://www.google.com")
-        print("Título de la página:", driver.title)
+        # Abrir la página de reserva
+        driver.get("https://app.glofox.com/")  # Reemplaza con la URL real
+        print("🌍 Página cargada:", driver.title)
+
+        # Esperar a que cargue el formulario de login
+        print("⌛ Esperando que cargue el formulario de login...")
+        elemento = WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "#login"))  # Verifica el selector
+        )
+        elemento.click()
+        print("✅ Elemento encontrado y clickeado")
 
         # ✅ Abrir Glofox
         driver.get("https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view")
