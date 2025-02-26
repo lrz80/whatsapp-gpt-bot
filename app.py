@@ -1,20 +1,13 @@
-import os
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
-from dotenv import load_dotenv
-import time
+import os
 import re
-
-# Cargar variables de entorno
-load_dotenv()
-
-TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
 app = Flask(__name__)
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
-    """ Maneja los mensajes entrantes de WhatsApp """
+    """Maneja los mensajes entrantes de WhatsApp"""
     incoming_msg = request.values.get("Body", "").strip().lower()
     resp = MessagingResponse()
 
@@ -24,19 +17,10 @@ def whatsapp_reply():
             msg = resp.message(respuesta)
             print(f"📩 Respuesta enviada: {respuesta}")
             return str(resp)
-
-    # 🔹 Buscar la respuesta en RESPUESTAS
-    respuesta = RESPUESTAS.get(incoming_msg, ["Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."])
-
-    # 🔹 Si la respuesta es una lista, enviamos varios mensajes
-    if isinstance(respuesta, list):
-        for msg in respuesta:
-            resp.message(msg)  # Enviar cada parte como un mensaje separado
-            time.sleep(1)  # Simula un pequeño retraso entre mensajes
-    else:
-        resp.message(respuesta)  # Si es un solo mensaje, lo envía normalmente
-
-    print(f"📩 Respuesta enviada: {respuesta}")
+    
+    # 🔸 Respuesta por defecto si no encontró coincidencia
+    msg = resp.message("Lo siento, no entiendo tu mensaje. Escríbenos 'ayuda' para más información. 🤖")
+    print(f"📩 Respuesta enviada: {msg}")
     return str(resp)
 
 # Mensajes predefinidos
