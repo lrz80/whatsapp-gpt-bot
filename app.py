@@ -14,11 +14,29 @@ app = Flask(__name__)
 # Mensajes predefinidos
 RESPUESTAS = {
     "hola": "¡Hola! Bienvenido a Spinzone Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
-    "horarios": "Nuestros horarios son: Cycling: Lunes a Jueves: 9am, 6:30pm y 7pm. Viernes: 9am y 7:30pm. Sabados y Domingos: 10am. Clases Funcionales: Lunes a Jueves: 10am y 5:30pm. Viernes: 10am. 📅",
+    "horarios": """Nuestros horarios son:
+
+    Cycling:
+    Lunes a Jueves: 9am, 6:30pm y 7pm.
+    Viernes: 9am y 7:30pm.
+    Sabados y Domingos: 10am.
+
+    Clases Funcionales:
+    Lunes a Jueves: 10am y 5:30pm.
+    Viernes: 10am. 📅""",
     "ubicacion": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
     "contacto": "Puedes llamarnos al +8633171646 o escribirnos por WhatsApp. 📞",
-    "precios": """Aca te comparto nuestra lista de precios: 
-    Primera clase GRATIS, 4 Clases: $49.99, 8 clases $79.99, 12 clases $99.99, 16 clases $129.99, Paquete ilimitados: Solo Cycling o Funcionales $159.99 por mes o $139.99 por mes en autopay por 3 meses, Cycling+Funcionales: $175.99 por mes o $155.99 por mes en autopay por 3 meses.""",
+    "precios": """Aca te comparto nuestra lista de precios:
+
+    Primera clase GRATIS
+    4 Clases: $49.99
+    8 clases $79.99
+    12 clases $99.99
+    16 clases $129.99
+    
+    Paquete ilimitados: 
+    Solo Cycling o Funcionales $159.99 por mes o $139.99 por mes en autopay por 3 meses
+    Cycling+Funcionales: $175.99 por mes o $155.99 por mes en autopay por 3 meses.""",
     "informacion": """Gracias por tu interés en Spinzone Indoorcycling. Somos mucho más que una clase de spinning, ofrecemos una experiencia única que combina intensidad, música envolvente y motivación sin límites. 
     ¿Qué es el Indoor Cycling? El indoor cycling es un entrenamiento cardiovascular de alta energía que se realiza en bicicletas estáticas con resistencia ajustable. Nuestras clases están guiadas por instructores expertos y acompañadas de música motivadora, lo que te ayuda a mejorar tu resistencia, quemar calorías y fortalecer piernas y glúteos mientras disfrutas del ritmo y la energía del grupo. 
     ¿Qué son las Clases Funcionales? Además del indoor cycling, ofrecemos clases funcionales, entrenamientos diseñados para trabajar todo el cuerpo con ejercicios que mejoran la fuerza, resistencia y coordinación. Utilizamos una combinación de peso corporal, bandas, mancuernas y otros elementos para garantizar un entrenamiento completo y efectivo. 
