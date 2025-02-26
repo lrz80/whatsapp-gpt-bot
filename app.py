@@ -10,19 +10,20 @@ port = int(os.environ.get("PORT", 5000))  # Puerto dinámico de Railway
 
 # Mensajes predefinidos
 RESPUESTAS = {
-    "hola": "¡Hola! Bienvenido a nuestro servicio de Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
-    "horarios": "Nuestros horarios son de 6 AM a 10 PM, de lunes a sábado. 📅",
-    "ubicacion": "Estamos ubicados en Av. Siempre Viva 123, Ciudad. 📍",
-    "contacto": "Puedes llamarnos al +123456789 o escribirnos por WhatsApp. 📞",
+    "hola": "¡Hola! Bienvenido a Spinzone Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
+    "horarios": "Nuestros horarios son: Cycling: Lunes a Jueves: 9am, 6:30pm y 7pm. Viernes: 9am y 7:30pm. Sabados y Domingos: 10am. Clases Funcionales: Lunes a Jueves: 10am y 5:30pm. Viernes: 10am. 📅",
+    "ubicacion": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
+    "contacto": "Puedes llamarnos al +8633171646 o escribirnos por WhatsApp. 📞",
+    "precios": "Primera clase GRATIS, 4 Clases: $49.99, 8 clases $79.99, 12 clases $99.99, 16 clases $129.99, Paquete ilimitados: Solo Cycling o Funcionales $159.99 por mes o $139.99 por mes en autopay por 3 meses, Cycling+Funcionales: $175.99 por mes o $155.99 por mes en autopay por 3 meses."
 }
 
 # Función para buscar en la web información sobre Indoor Cycling
 def buscar_informacion(pregunta):
     try:
-        response = requests.get(f"https://www.google.com/search?q={pregunta}+Indoor+Cycling")
-        return f"Encontré información en la web sobre tu pregunta: {response.url}"
+        response = requests.get(f"https://www.instagram.com/spinzone_indoorcycling/")
+        return f"Por supuesto! aca encontraras toda la informacion que necesites"
     except:
-        return "Lo siento, no pude encontrar información en la web en este momento."
+        return "Lo siento, no pude encontrar información en este momento."
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
