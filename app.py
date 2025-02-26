@@ -1,12 +1,15 @@
 import os
-from flask import Flask
-from flask import Flask, request, jsonify
+import time
+from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
-import requests
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
+
+TWILIO_WHATSAPP_NUMBER = os.getenv("TWILIO_WHATSAPP_NUMBER")
 
 app = Flask(__name__)
-
-port = int(os.environ.get("PORT", 5000))  # Puerto dinámico de Railway
 
 # Mensajes predefinidos
 RESPUESTAS = {
@@ -15,32 +18,26 @@ RESPUESTAS = {
     "ubicacion": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
     "contacto": "Puedes llamarnos al +8633171646 o escribirnos por WhatsApp. 📞",
     "precios": "Primera clase GRATIS, 4 Clases: $49.99, 8 clases $79.99, 12 clases $99.99, 16 clases $129.99, Paquete ilimitados: Solo Cycling o Funcionales $159.99 por mes o $139.99 por mes en autopay por 3 meses, Cycling+Funcionales: $175.99 por mes o $155.99 por mes en autopay por 3 meses."
+    "informacion": "Gracias por tu interés en Spinzone Indoorcycling. 🚴‍♂️🔥 Somos mucho más que una clase de spinning, ofrecemos una experiencia única que combina intensidad, música envolvente y motivación sin límites. 🔹 ¿Qué es el Indoor Cycling? El indoor cycling es un entrenamiento cardiovascular de alta energía que se realiza en bicicletas estáticas con resistencia ajustable. Nuestras clases están guiadas por instructores expertos y acompañadas de música motivadora, lo que te ayuda a mejorar tu resistencia, quemar calorías y fortalecer piernas y glúteos mientras disfrutas del ritmo y la energía del grupo. 🔹 ¿Qué son las Clases Funcionales? Además del indoor cycling, ofrecemos clases funcionales, entrenamientos diseñados para trabajar todo el cuerpo con ejercicios que mejoran la fuerza, resistencia y coordinación. Utilizamos una combinación de peso corporal, bandas, mancuernas y otros elementos para garantizar un entrenamiento completo y efectivo. 🔹 ¿Por qué elegir Spinzone? ✅ Clases dinámicas para todos los niveles. ✅ Entrenamiento guiado por instructores certificados. ✅ Ambiente motivador con música y energía inigualables. ✅ Equipos de última tecnología para un rendimiento óptimo. 🔹 ¿Dónde estamos ubicados? 📍 2175 Davenport Blvd Davenport Fl 33837. 🔹 ¿Cómo reservar una clase? Puedes agendar tu clase fácilmente registrandote a través de nuestro sitio web 👉 https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o contactarnos por WhatsApp 📲 +18633171646. Si tienes alguna otra pregunta, estaré encantado de ayudarte. ¡Esperamos verte pronto pedaleando y entrenando con nosotros! 🚴‍♀️💪✨"
 }
 
-# Función para buscar en la web información sobre Indoor Cycling
-def buscar_informacion(pregunta):
-    try:
-        response = requests.get(f"https://www.instagram.com/spinzone_indoorcycling/")
-        return f"Por supuesto! aca encontraras toda la informacion que necesites"
-    except:
-        return "Lo siento, no pude encontrar información en este momento."
-
 @app.route("/webhook", methods=["POST"])
-def webhook():
+def whatsapp_reply():
+    """ Maneja los mensajes entrantes de WhatsApp """
     incoming_msg = request.values.get("Body", "").strip().lower()
     resp = MessagingResponse()
-    
-    # Revisamos si hay una respuesta predefinida
-    for key in RESPUESTAS:
-        if key in incoming_msg:
-            resp.message(RESPUESTAS[key])
-            return str(resp)
 
-    # Si no hay respuesta predefinida, buscamos en la web
-    respuesta = buscar_informacion(incoming_msg)
-    resp.message(respuesta)
+    # 📌 Buscar la respuesta en RESPUESTAS o devolver mensaje por defecto
+    respuesta = RESPUESTAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje. Escríbenos 'ayuda' para más información. 🤖")
+
+    print(f"📩 Mensaje recibido: {incoming_msg}")
+    
+    time.sleep(2)  # ⏳ Simula un pequeño retraso como si respondiera un humano
+    
+    msg = resp.message(respuesta)
+    print(f"📤 Respuesta enviada: {respuesta}")
 
     return str(resp)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)

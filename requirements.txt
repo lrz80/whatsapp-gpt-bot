@@ -5,3 +5,5 @@ openai
 waitress
 requests
 webdriver-manager
+python-dotenv
+gunicorn
