@@ -65,9 +65,12 @@ def whatsapp_reply():
     resp = MessagingResponse()  
     msg = resp.message()  # Asegura que msg esté definido
 
-    respuesta_texto = "Lo siento, no entendí tu mensaje."
+    print(f"📩 Mensaje recibido: {incoming_msg}")
+    print(f"📲 Número de WhatsApp: {from_number}")
 
-    print(f"📩 Mensaje recibido: {incoming_msg} | 📞 De: {from_number}")
+    # 🟢 Definir un valor por defecto para 'respuesta'
+    respuesta = "Lo siento, no entendí tu mensaje."
+    respuesta_texto = "Lo siento, no entendí tu mensaje."
 
     # Enviar respuesta rápida antes de iniciar Selenium
     if "reservar" in incoming_msg:
