@@ -154,7 +154,9 @@ def whatsapp_reply():
     resp = MessagingResponse()
     resp.message(respuesta)
 
-    return Response(resp.to_xml(), mimetype="application/xml")  # Responde en formato XML
+    xml_response = resp.to_xml()  # Convierte correctamente a XML
+    return Response(xml_response, mimetype="application/xml")
+
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def whatsapp_reply():
