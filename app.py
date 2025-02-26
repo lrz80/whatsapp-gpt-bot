@@ -16,6 +16,8 @@ from selenium.webdriver.common.keys import Keys
 from flask import Flask, request, jsonify
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from flask import jsonify
+import threading
 
 app = Flask(__name__)
 
@@ -66,12 +68,13 @@ def whatsapp_reply():
     # 🔹 Respuestas rápidas
     incoming_msg = request.values.get("Body", "").strip().lower()
 
-    print(f"📩 Mensaje recibido: {incoming_msg}")
+    if "reservar" in incoming_msg:
+        # Enviar respuesta rápida a WhatsApp antes de iniciar Selenium
+        threading.Thread(target=reservar_clase).start()
+        return jsonify({"status": "success", "message": "⏳ Procesando tu reserva..."}), 200
 
     if "horarios" in incoming_msg:
         respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/..."
-    elif "reserva" in incoming_msg.strip().lower():
-        respuesta = "🎟 Reserva tu clase aquí: https://app.glofox.com/..."
         print(f"Mensaje procesado: '{incoming_msg}'")
     elif "precios" in incoming_msg:
         respuesta = "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."
@@ -81,10 +84,6 @@ def whatsapp_reply():
         respuesta = "📞 Nuestro número de contacto es +1 (863) 317-1646. Llámanos si necesitas más información."
     elif "sitio web" in incoming_msg or "página web" in incoming_msg:
         respuesta = "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com"
-    elif "reservar clase" in incoming_msg:
-        respuesta = "¡Claro! Estoy procesando tu reserva..."
-    elif "reservar_clase" in globals():  # Verifica si la función existe
-        respuesta = reservar_clase()  
     elif "hola" in incoming_msg or "buenas" in incoming_msg:
         respuesta = "¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?"
     # Aquí puedes llamar a la función de reserva si es necesario
@@ -132,16 +131,19 @@ def whatsapp_reply():
     return jsonify({"status": "success", "message": respuesta}), 200
 
 # 🔹 Automatización con Selenium para reservas en Glofox
-def reservar_clase():
+def whatsapp_reply():
+
     try:
         print("🔄 Iniciando Selenium...")
 
-        # Configurar Chrome en modo sin cabeza (headless)
+        # Configurar opciones de Chrome
         chrome_options = Options()
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.binary_location = "/usr/bin/google-chrome"  # Asegurar ubicación de Chrome
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.binary_location = "/usr/bin/google-chrome"
 
         # Iniciar WebDriver con las opciones configuradas
         service = Service(ChromeDriverManager().install())
@@ -153,7 +155,7 @@ def reservar_clase():
 
         # Esperar a que cargue el formulario de login
         print("⌛ Esperando que cargue el formulario de login...")
-        elemento = WebDriverWait(driver, 10).until(
+        elemento = WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.CSS_SELECTOR, "#login"))  # Verifica el selector
         )
         elemento.click()
