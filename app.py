@@ -12,15 +12,16 @@ def whatsapp_reply():
     resp = MessagingResponse()
 
     # 🔹 Buscar palabra clave dentro del mensaje usando regex
-    for key, respuesta in RESPUESTAS.items():
-        if re.search(rf"\b{key}\b", incoming_msg):  # Coincidencia exacta de palabra clave
-            msg = resp.message(respuesta)
-            print(f"📩 Respuesta enviada: {respuesta}")
-            return str(resp)
+    respuesta = next((RESPUESTAS[key] for key in RESPUESTAS if re.search(rf"\b{key}\b", incoming_msg)), 
+                     ["Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."])
+
+    # 🔸 Asegurar que la respuesta es un string
+    if isinstance(respuesta, list):
+        respuesta = "\n".join(respuesta)
+
+    resp.message(respuesta)
+    print(f"📩 Respuesta enviada: {respuesta}")
     
-    # 🔸 Respuesta por defecto si no encontró coincidencia
-    msg = resp.message("Lo siento, no entiendo tu mensaje. Escríbenos 'ayuda' para más información. 🤖")
-    print(f"📩 Respuesta enviada: {msg}")
     return str(resp)
 
 # Mensajes predefinidos
