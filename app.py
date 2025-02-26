@@ -1,8 +1,12 @@
+import os
+from flask import Flask
 from flask import Flask, request, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import requests
 
 app = Flask(__name__)
+
+port = int(os.environ.get("PORT", 5000))  # Puerto dinámico de Railway
 
 # Mensajes predefinidos
 RESPUESTAS = {
@@ -38,4 +42,4 @@ def webhook():
     return str(resp)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=5000)
