@@ -65,14 +65,14 @@ def whatsapp_reply():
     resp = MessagingResponse()  
     msg = resp.message()  # Asegura que msg esté definido
 
-    print(f"📩 Mensaje recibido: {incoming_msg} | 📞 De: {from_number}")
+    respuesta_texto = "Lo siento, no entendí tu mensaje."
 
-    respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
+    print(f"📩 Mensaje recibido: {incoming_msg} | 📞 De: {from_number}")
 
     # Enviar respuesta rápida antes de iniciar Selenium
     if "reservar" in incoming_msg:
-        print(f"📤 Respuesta enviada: {respuesta_texto}")
         threading.Thread(target=reservar_clase, args=()).start()  # Inicia la reserva en segundo plano
+        print(f"📤 Respuesta enviada: {respuesta_texto}")
         return jsonify({"status": "success", "message": "⏳ Procesando tu reserva..."}), 200
 
     # Respuestas rápidas
@@ -107,7 +107,7 @@ def whatsapp_reply():
     # Aquí puedes llamar a la función de reserva si es necesario
     else:
         print(f"📤 Respuesta enviada: {respuesta_texto}")
-        respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
+        respuesta_texto = "Lo siento, no entendí tu mensaje."
 
     # 🔹 Guardar historial de conversación
     from_number = request.values.get("From", "").strip()
@@ -137,7 +137,7 @@ def whatsapp_reply():
 
         # 🔹 Si el usuario menciona "reservar clase", iniciar Selenium
         if "reservar clase" in incoming_msg.lower():
-            respuesta = reservar_clase()
+            respuesta_texto = reservar_clase()
             msg.body(respuesta)
             return str(resp)
 
