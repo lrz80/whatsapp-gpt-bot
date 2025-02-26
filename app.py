@@ -56,10 +56,11 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
-    # Intentar obtener el mensaje desde form-data (Twilio) o JSON
-    incoming_msg = request.form.get("Body", "").strip().lower() or request.get_json().get("Body", "").strip().lower()
+    incoming_msg = request.form.get("Body", "").strip().lower()
+    print(f"📩 Mensaje recibido: {incoming_msg}")
 
-    print(f"📩 Mensaje recibido: {incoming_msg}")  # Log para debug
+    # Crea la respuesta de Twilio
+    resp = MessagingResponse()
 
     # Respuesta inmediata para "hola"
     if incoming_msg == "hola":
