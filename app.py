@@ -57,11 +57,10 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
-    data = request.get_json()
+    data = request.form  # 📌 Cambiar de request.get_json() a request.form
     incoming_msg = data.get("Body", "").strip().lower()
     from_number = data.get("From", "")
 
-    # 🔍 DEBUG: Imprimir el mensaje recibido y el número de quien lo envía
     print(f"📩 Mensaje recibido: {incoming_msg} | 📞 De: {from_number}")
 
     respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
