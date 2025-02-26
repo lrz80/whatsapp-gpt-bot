@@ -87,8 +87,6 @@ def whatsapp_reply():
     msg.body(respuesta)  # Enviar la respuesta al usuario
     print(f"Respuesta enviada: {respuesta}")
 
-    return jsonify({"status": "success", "message": respuesta}), 200
-
     # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
     historial = [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
@@ -124,7 +122,7 @@ def whatsapp_reply():
         print(f"❌ ERROR: {e}")
         msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
-    return str(resp)
+    return jsonify({"status": "success", "message": respuesta}), 200
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def reservar_clase():
