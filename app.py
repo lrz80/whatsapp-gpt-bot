@@ -93,6 +93,7 @@ def whatsapp_reply():
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
     # 🔹 Guardar historial de conversación
+    from_number = request.values.get("From", "").strip()
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
     historial = [{"role": row[0], "content": row[1]} for row in cursor.fetchall()]
     historial.append({"role": "user", "content": incoming_msg})
