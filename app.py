@@ -59,10 +59,6 @@ def whatsapp_reply():
     incoming_msg = request.values.get("Body", "").strip().lower()
     resp = MessagingResponse()
     msg = resp.message()
-    print(f"📩 Mensaje recibido: {incoming_msg}")
-
-    # Crea la respuesta de Twilio
-    resp = MessagingResponse()
 
     # Respuesta inmediata para "hola"
     if incoming_msg == "hola":
@@ -95,9 +91,6 @@ def whatsapp_reply():
     # Aquí puedes llamar a la función de reserva si es necesario
     else:
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
-
-    msg.body(respuesta)  # Enviar la respuesta al usuario
-    print(f"Respuesta enviada: {respuesta}")
 
     # 🔹 Guardar historial de conversación
     cursor.execute("SELECT role, content FROM conversaciones WHERE user=? ORDER BY id ASC", (from_number,))
@@ -134,7 +127,8 @@ def whatsapp_reply():
         print(f"❌ ERROR: {e}")
         msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
-    return str(resp)  # ⚠️ Twilio necesita que esto sea un string
+    print(f"📨 Respuesta enviada: {str(resp)}")  # DEBUG: Ver en logs
+    return Response(str(resp), mimetype="application/xml")  # 🔹 Responder en XML
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def whatsapp_reply():
