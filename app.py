@@ -149,7 +149,15 @@ def whatsapp_reply():
         msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
     print(f"📤 Respuesta enviada: {respuesta}")
-    return Response(str(resp), mimetype="application/xml")  # 🔹 Responder en XML
+    
+    # 📌 IMPORTANTE: Usar MessagingResponse() para que Twilio envíe la respuesta
+    resp = MessagingResponse()
+    resp.message(respuesta)
+
+    return str(resp), 200
+
+if __name__ == "__main__":
+    app.run(debug=True)
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def whatsapp_reply():
