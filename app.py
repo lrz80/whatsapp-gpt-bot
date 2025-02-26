@@ -1,4 +1,5 @@
 import os
+from waitress import serve
 import subprocess
 import requests
 import time
@@ -55,37 +56,39 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
+    data = request.get_json()
+    incoming_msg = data.get("Body", "").strip().lower()
 
-    
-    incoming_msg = request.values.get("Body", "").strip().lower()
-    print(f"📩 Mensaje recibido: {incoming_msg}")
+    print(f"📩 Mensaje recibido: {incoming_msg}")  # Log para debug
 
-    from_number = request.values.get("From", "").strip()
-    resp = MessagingResponse()
-    msg = resp.message()
-    respuesta = "Error: No se pudo procesar la solicitud."  # Definir valor inicial
+    # Respuesta inmediata para "hola"
+    if incoming_msg == "hola":
+        return jsonify({"status": "success", "message": "¡Hola! ¿En qué puedo ayudarte?"}), 200
 
-    # 🔹 Respuestas rápidas
-    incoming_msg = request.values.get("Body", "").strip().lower()
-
+    # Enviar respuesta rápida antes de iniciar Selenium
     if "reservar" in incoming_msg:
-        # Enviar respuesta rápida a WhatsApp antes de iniciar Selenium
-        threading.Thread(target=reservar_clase).start()
+        threading.Thread(target=reservar_clase, args=()).start()  # Inicia la reserva en segundo plano
         return jsonify({"status": "success", "message": "⏳ Procesando tu reserva..."}), 200
 
+    # Respuestas rápidas
     if "horarios" in incoming_msg:
-        respuesta = "📅 Los horarios y reservas están aquí: https://app.glofox.com/..."
-        print(f"Mensaje procesado: '{incoming_msg}'")
-    elif "precios" in incoming_msg:
-        respuesta = "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."
-    elif "ubicación" in incoming_msg or "dirección" in incoming_msg:
-        respuesta = "📍 Estamos ubicados en 2175 Davenport Blvd, Davenport FL 33837. ¡Te esperamos!"
-    elif "teléfono" in incoming_msg or "contacto" in incoming_msg:
-        respuesta = "📞 Nuestro número de contacto es +1 (863) 317-1646. Llámanos si necesitas más información."
-    elif "sitio web" in incoming_msg or "página web" in incoming_msg:
-        respuesta = "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com"
-    elif "hola" in incoming_msg or "buenas" in incoming_msg:
-        respuesta = "¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?"
+        return jsonify({"status": "success", "message": "🕒 Los horarios y reservas están aquí: https://app.glofox.com/..."}), 200
+
+    if "precios" in incoming_msg:
+        return jsonify({"status": "success", "message": "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."}), 200
+
+    if "ubicación" in incoming_msg or "dirección" in incoming_msg:
+        return jsonify({"status": "success", "message": "📍 Estamos ubicados en 2175 Davenport Blvd, Davenport FL 33837. ¡Te esperamos!..."}), 200
+
+    if "teléfono" in incoming_msg or "contacto" in incoming_msg:
+        return jsonify({"status": "success", "message": "📞 Nuestro número de contacto es +1 (863) 317-1646. Llámanos si necesitas más información..."}), 200
+    
+    if "sitio web" in incoming_msg or "página web" in incoming_msg:
+        return jsonify({"status": "success", "message": "🌐 Puedes visitar nuestro sitio web aquí: https://spinzoneinc.com..."}), 200
+    
+    if "hola" in incoming_msg or "buenas" in incoming_msg:
+        return jsonify({"status": "success", "message": " ¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?..."}), 200
+    
     # Aquí puedes llamar a la función de reserva si es necesario
     else:
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
