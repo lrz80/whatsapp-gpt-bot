@@ -154,7 +154,7 @@ def whatsapp_reply():
     resp = MessagingResponse()
     resp.message(respuesta)
 
-    return str(resp), 200
+    return str(resp)  # Asegura que solo devuelves el string de Twilio
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def whatsapp_reply():
@@ -218,6 +218,5 @@ def whatsapp_reply():
     
 if __name__ == "__main__":
     from waitress import serve
-    PORT = int(os.environ.get("PORT", 5000))
-    print(f"🚀 Servidor iniciando en http://0.0.0.0:{PORT}")
-    serve(app, host="0.0.0.0", port=PORT)
+    serve(app, host="0.0.0.0", port=5000)
+
