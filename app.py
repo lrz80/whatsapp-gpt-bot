@@ -81,7 +81,7 @@ def whatsapp_reply():
     # Respuestas rápidas
     if "horarios" in incoming_msg:
         print(f"📤 Respuesta enviada: {respuesta_texto}")
-        return jsonify({"status": "success", "message": "🕒 Los horarios y reservas están aquí: https://app.glofox.com/..."}), 200
+        respuesta = "🕒 Los horarios y reservas están aquí: https://app.glofox.com/...", 200
 
     if "precios" in incoming_msg or "planes" in incoming_msg:
         print(f"📤 Respuesta enviada: {respuesta_texto}")
