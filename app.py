@@ -72,7 +72,7 @@ RESPUESTAS = {
         "¿Cómo reservar una clase?\nPuedes agendar tu clase fácilmente registrandote a través de nuestro sitio web  https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o contactarnos por WhatsApp +18633171646.",
         
         "Si tienes alguna otra pregunta, estaré encantado de ayudarte. ¡Esperamos verte pronto pedaleando y entrenando con nosotros!",
-    
+    ],
     "no me deja seleccionar numero de bicicleta":
     "🛠 **Solución para seleccionar número de bicicleta**\n"  
     "🔹 Si es tu primera reserva, el sistema puede tardar en actualizarse. Inténtalo nuevamente en unos minutos.\n"  
