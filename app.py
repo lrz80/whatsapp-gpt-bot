@@ -154,7 +154,7 @@ def whatsapp_reply():
     resp = MessagingResponse()
     resp.message(respuesta)
 
-    return str(resp)  # Asegura que solo devuelves el string de Twilio
+    return Response(resp.to_xml(), mimetype="application/xml")  # Responde en formato XML
 
 # 🔹 Automatización con Selenium para reservas en Glofox
 def whatsapp_reply():
