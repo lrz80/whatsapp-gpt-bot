@@ -1,5 +1,4 @@
 import os
-import time
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 from dotenv import load_dotenv
@@ -87,24 +86,6 @@ RESPUESTAS = {
     "\n"
     "📲 Si después de intentar estos pasos aún tienes problemas, contáctanos por WhatsApp al **+18633171646**."
 }
-
-@app.route("/webhook", methods=["POST"])
-def whatsapp_reply():
-    """ Maneja los mensajes entrantes de WhatsApp """
-    incoming_msg = request.values.get("Body", "").strip().lower()
-    resp = MessagingResponse()
-
-    # 📌 Buscar la respuesta en RESPUESTAS o devolver mensaje por defecto
-    respuesta = RESPUESTAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje. Escríbenos 'ayuda' para más información. 🤖")
-
-    print(f"📩 Mensaje recibido: {incoming_msg}")
-    
-    time.sleep(2)  # ⏳ Simula un pequeño retraso como si respondiera un humano
-    
-    msg = resp.message(respuesta)
-    print(f"📤 Respuesta enviada: {respuesta}")
-
-    return str(resp)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
