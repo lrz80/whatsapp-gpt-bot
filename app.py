@@ -154,7 +154,7 @@ def whatsapp_reply():
     resp = MessagingResponse()
     resp.message(respuesta)
 
-    xml_response = resp.to_xml()  # Convierte correctamente a XML
+    xml_response = str(resp.to_xml())  # Convierte correctamente a string
     return Response(xml_response, mimetype="application/xml")
 
 
