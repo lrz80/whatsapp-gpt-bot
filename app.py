@@ -57,13 +57,14 @@ def home():
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
-    incoming_msg = request.values.get("Body", "").strip().lower()
-    resp = MessagingResponse()
-    msg = resp.message()
+    data = request.get_json()
+    incoming_msg = data.get("Body", "").strip().lower()
+    from_number = data.get("From", "")
 
-    # Respuesta inmediata para "hola"
-    if incoming_msg == "hola":
-        return jsonify({"status": "success", "message": "¡Hola! ¿En qué puedo ayudarte?"}), 200
+    # 🔍 DEBUG: Imprimir el mensaje recibido y el número de quien lo envía
+    print(f"📩 Mensaje recibido: {incoming_msg} | 📞 De: {from_number}")
+
+    respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
 
     # Enviar respuesta rápida antes de iniciar Selenium
     if "reservar" in incoming_msg:
@@ -74,7 +75,7 @@ def whatsapp_reply():
     if "horarios" in incoming_msg:
         return jsonify({"status": "success", "message": "🕒 Los horarios y reservas están aquí: https://app.glofox.com/..."}), 200
 
-    if "precios" in incoming_msg:
+    if "precios" in incoming_msg or "planes" in incoming_msg:
         return jsonify({"status": "success", "message": "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."}), 200
 
     if "ubicación" in incoming_msg or "dirección" in incoming_msg:
@@ -89,6 +90,9 @@ def whatsapp_reply():
     if "hola" in incoming_msg or "buenas" in incoming_msg:
         return jsonify({"status": "success", "message": " ¡Hola! Bienvenido a SpinZone. ¿En qué puedo ayudarte?..."}), 200
     
+    elif "informacion" in incoming_msg or "más información" in incoming_msg:
+        return jsonify({"status": "success", "message": "💲 Consulta precios y membresías aquí: https://app.glofox.com/..."}), 200
+
     # Aquí puedes llamar a la función de reserva si es necesario
     else:
         respuesta = "Lo siento, no entendí tu mensaje. ¿Puedes reformularlo?"
@@ -129,7 +133,7 @@ def whatsapp_reply():
         print(f"❌ ERROR: {e}")
         msg.body("Lo siento, hubo un error al procesar tu mensaje. Inténtalo más tarde.")
 
-    print(f"📨 Respuesta enviada: {str(resp)}")  # DEBUG: Ver en logs
+    print(f"📤 Respuesta enviada: {respuesta}")
     return Response(str(resp), mimetype="application/xml")  # 🔹 Responder en XML
 
 # 🔹 Automatización con Selenium para reservas en Glofox
