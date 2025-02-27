@@ -9,6 +9,14 @@ app = Flask(__name__)
 def normalizar_texto(texto):
     return unidecode(texto.lower())  # Convierte a minúsculas y elimina acentos
 
+def enviar_respuesta(resp, mensaje):
+    """Divide y envía mensajes largos en partes más cortas."""
+    limite = 1500  # Máximo seguro antes de 1600
+    partes = [mensaje[i:i+limite] for i in range(0, len(mensaje), limite)]
+    
+    for parte in partes:
+        resp.message(parte)
+
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp"""
@@ -25,7 +33,7 @@ def whatsapp_reply():
                      ["Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información. 🆘"])
 
     # 📩 Enviar respuesta
-    msg = resp.message("\n".join(respuesta) if isinstance(respuesta, list) else respuesta)
+    enviar_respuesta(resp,"\n".join(respuesta) if isinstance(respuesta, list) else respuesta)
 
     print(f"📩 Respuesta enviada: {respuesta}")
 
