@@ -29,8 +29,7 @@ def whatsapp_reply():
     RESPUESTAS_NORMALIZADAS = {normalizar_texto(k): v for k, v in RESPUESTAS.items()}
 
     # 🔹 Buscar palabra clave dentro del mensaje usando regex
-    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if re.search(rf"\b{key}\b", incoming_msg)), 
-                     ["Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información. 🆘"])
+    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key and re.search(rf"\b{re.escape(key)}\b", incoming_msg)), None),
 
     # 📩 Enviar respuesta
     enviar_respuesta(resp,"\n".join(respuesta) if isinstance(respuesta, list) else respuesta)
@@ -74,8 +73,6 @@ RESPUESTAS = {
         "**¿Qué son las Clases Funcionales?**\nAdemás del indoor cycling, ofrecemos clases funcionales, entrenamientos diseñados para trabajar todo el cuerpo con ejercicios que mejoran la fuerza, resistencia y coordinación. Utilizamos una combinación de peso corporal, bandas, mancuernas y otros elementos para garantizar un entrenamiento completo y efectivo.", 
         
         "**¿Por qué elegir Spinzone?**\nClases dinámicas para todos los niveles.\nEntrenamiento guiado por instructores certificados.\nAmbiente motivador con música y energía inigualables.\nEquipos de última tecnología para un rendimiento óptimo.", 
-        
-        "**¿Cómo reservar una clase?**\nPuedes agendar tu clase fácilmente registrandote a través de nuestro sitio web  https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o enviarnos:\nNombre.\nApellido.\nFecha de Nacimiento.\nNumero de Telefono\nEmail\nal WhatsApp +18633171646.",
         
         "Si tienes alguna otra pregunta, estaré encantado de ayudarte.\n¡Esperamos verte pronto pedaleando y entrenando con nosotros!",
     ],
