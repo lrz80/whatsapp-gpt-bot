@@ -7,3 +7,4 @@ requests
 webdriver-manager
 python-dotenv
 gunicorn
+unidecode
