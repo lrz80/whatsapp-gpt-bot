@@ -8,3 +8,5 @@ webdriver-manager
 python-dotenv
 gunicorn
 unidecode
+langdetect
+googletrans

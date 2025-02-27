@@ -3,8 +3,22 @@ from twilio.twiml.messaging_response import MessagingResponse
 import os
 import re
 from unidecode import unidecode
+from langdetect import detect
+from googletrans import Translator
 
 app = Flask(__name__)
+
+def traducir_texto(texto, idioma_destino):
+    """Traduce el texto al idioma deseado"""
+    traductor = Translator()
+    traduccion = traductor.translate(texto, dest=idioma_destino)
+    return traduccion.text
+
+def detectar_idioma(texto):
+    try:
+        return detect(texto)
+    except:
+        return "es"  # Si hay error, por defecto español
 
 def normalizar_texto(texto):
     return unidecode(texto.lower())  # Convierte a minúsculas y elimina acentos
@@ -20,49 +34,34 @@ def enviar_respuesta(resp, mensaje):
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp"""
-    incoming_msg = normalizar_texto(request.values.get("Body", "").strip())  
-    print(f"Mensaje recibido (normalizado): {incoming_msg}")  # Debug
+    incoming_msg = request.values.get("Body", "").strip()
+    idioma_detectado = detectar_idioma(incoming_msg)  # Detectar el idioma
+    
+    incoming_msg = normalizar_texto(incoming_msg)  # Normalizar mensaje
 
     resp = MessagingResponse()
 
-    incoming_msg = normalizar_texto(incoming_msg)  # Convierte a minúsculas y quita acentos
-
+    # Normalizar claves del diccionario RESPUESTAS
     RESPUESTAS_NORMALIZADAS = {}
     for claves, valor in RESPUESTAS.items():
         if isinstance(claves, tuple):  # Si la clave es una tupla (varias palabras)
             for palabra in claves:
                 RESPUESTAS_NORMALIZADAS[normalizar_texto(palabra)] = valor
-    else:  # Si es una clave única
-        RESPUESTAS_NORMALIZADAS[normalizar_texto(claves)] = valor
+        else:  # Si es una clave única
+            RESPUESTAS_NORMALIZADAS[normalizar_texto(claves)] = valor
 
-    print(f"Palabras clave disponibles: {list(RESPUESTAS_NORMALIZADAS.keys())}")  
+    # Buscar palabra clave dentro del mensaje usando regex
+    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
 
-    respuesta = None  
-    for claves, resp in RESPUESTAS.items():  
-        if isinstance(claves, tuple):  # Si la clave es una tupla (lista de palabras)  
-            if any(re.search(rf"\b{re.escape(key)}\b", incoming_msg) for key in claves):  
-                respuesta = resp  
-                break  
-        else:  # Si la clave es una sola palabra  
-            if re.search(rf"\b{re.escape(claves)}\b", incoming_msg):  
-                respuesta = resp  
-                break  
+    # Traducir la respuesta si el usuario no habla español
+    respuesta = traducir_texto(respuesta, idioma_detectado)
 
-    if respuesta is None:  
-        respuesta = "Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."  
+    # Enviar la respuesta
+    enviar_respuesta(resp, respuesta)
 
-    print(f"Respuesta encontrada: {respuesta}")  # Debug  
+    print(f"📢 Respuesta enviada: {respuesta}")
 
-    # 📩 Enviar respuesta
-    if isinstance(respuesta, (list, tuple)): 
-        respuesta = "\n".join(respuesta)  # Convierte lista/tupla en string
-
-    enviar_respuesta(resp, respuesta)  # Envía la respuesta final
-
-
-    print(f"📩 Respuesta enviada: {respuesta}")
-
-    return str(resp)  
+    return str(resp)
 
 # Mensajes predefinidos
 RESPUESTAS = {
