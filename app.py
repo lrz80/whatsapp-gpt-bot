@@ -29,7 +29,11 @@ def whatsapp_reply():
     RESPUESTAS_NORMALIZADAS = {normalizar_texto(k): v for k, v in RESPUESTAS.items()}
 
     # 🔹 Buscar palabra clave dentro del mensaje usando regex
-    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key and re.search(rf"\b{re.escape(key)}\b", incoming_msg)), None),
+    respuesta = next(
+    (RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS 
+     if key.strip() and re.search(rf"\b{re.escape(key)}\b", incoming_msg)), 
+    "Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."
+)
 
     # 📩 Enviar respuesta
     enviar_respuesta(resp,"\n".join(respuesta) if isinstance(respuesta, list) else respuesta)
@@ -66,13 +70,13 @@ RESPUESTAS = {
     Solo Cycling o Funcionales $159.99 por mes o $139.99 por mes en autopay por 3 meses
     Cycling+Funcionales: $175.99 por mes o $155.99 por mes en autopay por 3 meses.""",
     "informacion":[ 
-        "Gracias por tu interés en Spinzone Indoorcycling. Somos mucho más que una clase de spinning, ofrecemos una experiencia única que combina intensidad, música envolvente y motivación sin límites.", 
+        "Gracias por tu interés en Spinzone Indoorcycling. Somos mucho más que una clase de spinning, ofrecemos una experiencia única que combina intensidad, música envolvente y motivación sin límites.\n", 
         
-        "**¿Qué es el Indoor Cycling?**\nEl indoor cycling es un entrenamiento cardiovascular de alta energía que se realiza en bicicletas estáticas con resistencia ajustable. Nuestras clases están guiadas por instructores expertos y acompañadas de música motivadora, lo que te ayuda a mejorar tu resistencia, quemar calorías y fortalecer piernas y glúteos mientras disfrutas del ritmo y la energía del grupo.", 
+        "**¿Qué es el Indoor Cycling?**\nEl indoor cycling es un entrenamiento cardiovascular de alta energía que se realiza en bicicletas estáticas con resistencia ajustable. Nuestras clases están guiadas por instructores expertos y acompañadas de música motivadora, lo que te ayuda a mejorar tu resistencia, quemar calorías y fortalecer piernas y glúteos mientras disfrutas del ritmo y la energía del grupo.\n", 
         
-        "**¿Qué son las Clases Funcionales?**\nAdemás del indoor cycling, ofrecemos clases funcionales, entrenamientos diseñados para trabajar todo el cuerpo con ejercicios que mejoran la fuerza, resistencia y coordinación. Utilizamos una combinación de peso corporal, bandas, mancuernas y otros elementos para garantizar un entrenamiento completo y efectivo.", 
+        "**¿Qué son las Clases Funcionales?**\nAdemás del indoor cycling, ofrecemos clases funcionales, entrenamientos diseñados para trabajar todo el cuerpo con ejercicios que mejoran la fuerza, resistencia y coordinación. Utilizamos una combinación de peso corporal, bandas, mancuernas y otros elementos para garantizar un entrenamiento completo y efectivo.\n", 
         
-        "**¿Por qué elegir Spinzone?**\nClases dinámicas para todos los niveles.\nEntrenamiento guiado por instructores certificados.\nAmbiente motivador con música y energía inigualables.\nEquipos de última tecnología para un rendimiento óptimo.", 
+        "**¿Por qué elegir Spinzone?**\nClases dinámicas para todos los niveles.\nEntrenamiento guiado por instructores certificados.\nAmbiente motivador con música y energía inigualables.\nEquipos de última tecnología para un rendimiento óptimo.\n", 
         
         "Si tienes alguna otra pregunta, estaré encantado de ayudarte.\n¡Esperamos verte pronto pedaleando y entrenando con nosotros!",
     ],
@@ -80,7 +84,7 @@ RESPUESTAS = {
     "🛠 **Solución para seleccionar número de bicicleta**\n"  
     "🔹 A veces, cuando es la primera reserva, el sistema asigna automaticamente una bicicleta.\n"  
     "\n"
-    "🔹 **Cancelar la reserva actual:**\n"  
+    "🔹 **Cancelar la reserva o reserva actual:**\n"  
     "- Accede a nuestra App y ve a tus reservas.\n"  
     "- Selecciona la clase y cancela la reserva.\n\n"  
     "\n"
