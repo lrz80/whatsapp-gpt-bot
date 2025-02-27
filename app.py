@@ -91,7 +91,6 @@ RESPUESTAS_NORMALIZADAS = {k: v for k, v in RESPUESTAS.items()}
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp de forma síncrona."""
-    global RESPUESTAS_NORMALIZADAS
     incoming_msg = request.values.get("Body", "").strip()
     idioma_detectado = detectar_idioma(incoming_msg)
     incoming_msg = normalizar_texto(incoming_msg)
@@ -100,20 +99,18 @@ def whatsapp_reply():
     respuesta = RESPUESTAS_NORMALIZADAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje.")
     respuesta = traducir_texto(respuesta, idioma_detectado)  # Traducción en modo síncrono
 
-    # Normalizar claves del diccionario RESPUESTAS
-    RESPUESTAS_NORMALIZADAS = {}
-    for claves, valor in RESPUESTAS.items():
-        if isinstance(claves, tuple):  # Si la clave es una tupla (varias palabras)
-            for palabra in claves:
-                RESPUESTAS_NORMALIZADAS[normalizar_texto(palabra)] = valor
-        else:  # Si es una clave única
-            RESPUESTAS_NORMALIZADAS[normalizar_texto(claves)] = valor
-
-    # Buscar palabra clave en el mensaje
-    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
+    # ✅ Asegurar que RESPUESTAS_NORMALIZADAS existe antes de usarla
+    global RESPUESTAS_NORMALIZADAS  
+    if incoming_msg in RESPUESTAS_NORMALIZADAS:
+        respuesta = RESPUESTAS_NORMALIZADAS[incoming_msg]
+    else:
+        respuesta = "Lo siento, no entiendo tu mensaje."
 
     # Traducir la respuesta al idioma detectado
     respuesta = traducir_texto(respuesta, idioma_detectado)  # ✅ Versión síncrona
+
+    # Buscar palabra clave en el mensaje
+    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
 
     # Enviar la respuesta
     enviar_respuesta(resp, respuesta)
