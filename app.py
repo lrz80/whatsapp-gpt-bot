@@ -86,6 +86,8 @@ RESPUESTAS = {
     "📲 Si después de intentar estos pasos aún tienes problemas, contáctanos por WhatsApp al **+18633171646**."
 }
 
+RESPUESTAS_NORMALIZADAS = {}
+
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp de forma síncrona."""
@@ -94,19 +96,20 @@ def whatsapp_reply():
     incoming_msg = normalizar_texto(incoming_msg)
 
     resp = MessagingResponse()
+
+    # ✅ Asegurar que RESPUESTAS_NORMALIZADAS se llena correctamente
+    RESPUESTAS_NORMALIZADAS.clear()
+    RESPUESTAS_NORMALIZADAS.update({k: v for k, v in RESPUESTAS.items()})
+
     respuesta = RESPUESTAS_NORMALIZADAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje.")
+
     respuesta = traducir_texto(respuesta, idioma_detectado)  # Traducción en modo síncrono
-    global RESPUESTAS_NORMALIZADAS  
-    RESPUESTAS_NORMALIZADAS = {k: v for k, v in RESPUESTAS.items()}
     
     # ✅ Asegurar que RESPUESTAS_NORMALIZADAS existe antes de usarla
     if incoming_msg in RESPUESTAS_NORMALIZADAS:
         respuesta = RESPUESTAS_NORMALIZADAS[incoming_msg]
     else:
         respuesta = "Lo siento, no entiendo tu mensaje."
-
-    # Traducir la respuesta al idioma detectado
-    respuesta = traducir_texto(respuesta, idioma_detectado)  # ✅ Versión síncrona
 
     # Buscar palabra clave en el mensaje
     respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
