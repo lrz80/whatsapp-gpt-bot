@@ -9,9 +9,10 @@ from unidecode import unidecode
 app = Flask(__name__)
 
 def traducir_texto(texto, idioma_destino):
+    """Traduce el texto al idioma deseado de forma síncrona."""
     traductor = Translator()
     traduccion = traductor.translate(texto, dest=idioma_destino)
-    return getattr(traduccion, 'text', texto)  # Evita errores si la traducción falla
+    return traduccion.text  # Asegura que devuelve el texto directamente
 
 # Función para detectar el idioma
 def detectar_idioma(texto):
@@ -34,12 +35,14 @@ def enviar_respuesta(resp, mensaje):
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
-    """Maneja los mensajes entrantes de WhatsApp."""
+    """Maneja los mensajes entrantes de WhatsApp de forma síncrona."""
     incoming_msg = request.values.get("Body", "").strip()
-    idioma_detectado = detectar_idioma(incoming_msg)  # Detecta idioma
-    incoming_msg = normalizar_texto(incoming_msg)  # Normaliza el mensaje
+    idioma_detectado = detectar_idioma(incoming_msg)
+    incoming_msg = normalizar_texto(incoming_msg)
 
     resp = MessagingResponse()
+    respuesta = RESPUESTAS_NORMALIZADAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje.")
+    respuesta = traducir_texto(respuesta, idioma_detectado)  # Traducción en modo síncrono
 
 # Normalizar claves del diccionario RESPUESTAS
     RESPUESTAS_NORMALIZADAS = {}
