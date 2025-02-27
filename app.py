@@ -25,15 +25,19 @@ def whatsapp_reply():
 
     resp = MessagingResponse()
 
+    incoming_msg = normalizar_texto(incoming_msg)  # Convierte a minúsculas y quita acentos
+
     # 🔹 Normalizar claves del diccionario RESPUESTAS
     RESPUESTAS_NORMALIZADAS = {normalizar_texto(k): v for k, v in RESPUESTAS.items()}
 
     # 🔹 Buscar palabra clave dentro del mensaje usando regex
     respuesta = next(
     (RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS 
-     if key.strip() and re.search(rf"\b{re.escape(key)}\b", incoming_msg)), 
-    "Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."
-)
+    if key and re.search(rf"\b{re.escape(key)}\b", incoming_msg)), None)
+
+    # Si no encuentra coincidencia, asigna el mensaje por defecto
+    if respuesta is None:
+        respuesta = "Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."
 
     # 📩 Enviar respuesta
     if isinstance(respuesta, (list, tuple)): 
