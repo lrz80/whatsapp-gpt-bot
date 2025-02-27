@@ -36,7 +36,11 @@ def whatsapp_reply():
 )
 
     # 📩 Enviar respuesta
-    enviar_respuesta(resp,"\n".join(respuesta) if isinstance(respuesta, list) else respuesta)
+    if isinstance(respuesta, (list, tuple)): 
+        respuesta = "\n".join(respuesta)  # Convierte lista/tupla en string
+
+    enviar_respuesta(resp, respuesta)  # Envía la respuesta final
+
 
     print(f"📩 Respuesta enviada: {respuesta}")
 
@@ -44,7 +48,7 @@ def whatsapp_reply():
 
 # Mensajes predefinidos
 RESPUESTAS = {
-    "hola": "¡Hola! Bienvenido a Spinzone Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
+    "hola o buenas": "¡Hola! Bienvenido a Spinzone Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
     "horarios": """**Nuestros horarios son:**
 
     **Cycling:**
@@ -55,9 +59,9 @@ RESPUESTAS = {
     **Clases Funcionales:**
     Lunes a Jueves: 10am y 5:30pm.
     Viernes: 10am. 📅""",
-    "**¿Dónde estamos ubicados?**": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
+    "**Dónde estan ubicados o ubicacion?**": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
     "**numero de contacto o telefono**": "Puedes llamarnos al +8633171646 o escribirnos por WhatsApp. 📞",
-    "**¿Cómo reservar una clase o clase gratis?**": "Puedes agendar tu clase fácilmente registrandote a través de nuestro sitio web  https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o enviarnos:\nNombre.\nApellido.\nFecha de Nacimiento.\nNumero de Telefono\nEmail\nal WhatsApp +18633171646.",
+    "**Cómo reservar una clase o clase gratis o quiero registrarme?**": "Puedes agendar tu clase fácilmente registrandote a través de nuestro sitio web  https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o enviarnos:\nNombre.\nApellido.\nFecha de Nacimiento.\nNumero de Telefono\nEmail\nal WhatsApp +18633171646.",
     "**precios o membresias**": """Te comparto nuestra lista de precios:
 
     **Primera clase GRATIS**
