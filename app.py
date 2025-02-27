@@ -27,8 +27,13 @@ def whatsapp_reply():
 
     incoming_msg = normalizar_texto(incoming_msg)  # Convierte a minúsculas y quita acentos
 
-    # 🔹 Normalizar claves del diccionario RESPUESTAS
-    RESPUESTAS_NORMALIZADAS = {normalizar_texto(k): v for k, v in RESPUESTAS.items()}
+    RESPUESTAS_NORMALIZADAS = {}
+    for claves, valor in RESPUESTAS.items():
+        if isinstance(claves, tuple):  # Si la clave es una tupla (varias palabras)
+            for palabra in claves:
+                RESPUESTAS_NORMALIZADAS[normalizar_texto(palabra)] = valor
+    else:  # Si es una clave única
+        RESPUESTAS_NORMALIZADAS[normalizar_texto(claves)] = valor
 
     print(f"Palabras clave disponibles: {list(RESPUESTAS_NORMALIZADAS.keys())}")  
 
@@ -97,7 +102,7 @@ RESPUESTAS = {
         
         "Si tienes alguna otra pregunta, estaré encantado de ayudarte.\n¡Esperamos verte pronto pedaleando y entrenando con nosotros!",
     ],
-    ("**no me deja seleccionar numero de bicicleta**", "bici"):
+    ("no me deja seleccionar numero de bicicleta", "bici", "spot"):
     "🛠 **Solución para seleccionar número de bicicleta**\n"  
     "🔹 A veces, cuando es la primera reserva, el sistema asigna automaticamente una bicicleta.\n"  
     "\n"
