@@ -5,13 +5,14 @@ import re
 from unidecode import unidecode
 from langdetect import detect
 from googletrans import Translator
+import asyncio
 
 app = Flask(__name__)
 
-def traducir_texto(texto, idioma_destino):
+async def traducir_texto(texto, idioma_destino):
     """Traduce el texto al idioma deseado"""
     traductor = Translator()
-    traduccion = traductor.translate(texto, dest=idioma_destino)
+    traduccion = await traductor.translate(texto, dest=idioma_destino)
     return traduccion.text
 
 def detectar_idioma(texto):
@@ -54,7 +55,7 @@ def whatsapp_reply():
     respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
 
     # Traducir la respuesta si el usuario no habla español
-    respuesta = traducir_texto(respuesta, idioma_detectado)
+    respuesta = await traducir_texto(respuesta, idioma_detectado)
 
     # Enviar la respuesta
     enviar_respuesta(resp, respuesta)
