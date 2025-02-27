@@ -11,12 +11,7 @@ app = Flask(__name__)
 def traducir_texto(texto, idioma_destino):
     """Traduce el texto al idioma deseado de forma síncrona."""
     traductor = Translator()
-    traduccion = traductor.translate(texto, dest=idioma_destino)
-    
-    # Esperar la traducción si es una corutina
-    if hasattr(traduccion, "result"):
-        traduccion = traduccion.result()
-
+    traduccion = asyncio.run(traductor.translate(texto, dest=idioma_destino))  # ✅ Ejecuta la corutina en modo síncrono
     return traduccion.text
 
 # Función para detectar el idioma
