@@ -2,29 +2,34 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import re
+from unidecode import unidecode
 
 app = Flask(__name__)
+
+def normalizar_texto(texto):
+    return unidecode(texto.lower())  # Convierte a minúsculas y elimina acentos
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp"""
     incoming_msg = request.values.get("Body", "").strip().lower()
+    incoming_msg = normalizar_texto(incoming_msg)  # 🔹 Normalizar mensaje
+
     resp = MessagingResponse()
 
+    # 🔹 Normalizar claves del diccionario RESPUESTAS
+    RESPUESTAS_NORMALIZADAS = {normalizar_texto(k): v for k, v in RESPUESTAS.items()}
+
     # 🔹 Buscar palabra clave dentro del mensaje usando regex
-    respuesta = next((RESPUESTAS[key] for key in RESPUESTAS if re.search(rf"\b{key}\b", incoming_msg)), 
+    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if re.search(rf"\b{key}\b", incoming_msg)), 
                      ["Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información. 🆘"])
 
-    # 🔸 Asegurar que la respuesta es un string
-    if isinstance(respuesta, list):
-        respuesta = "\n".join(respuesta)
+    # 📩 Enviar respuesta
+    msg = resp.message("\n".join(respuesta) if isinstance(respuesta, list) else respuesta)
 
-    # 📩 Enviar respuesta en formato texto plano
-    msg = resp.message(respuesta)
-    
     print(f"📩 Respuesta enviada: {respuesta}")
-    
-    return str(resp)  # 💡 Convertir a string antes de retornar
+
+    return str(resp)  
 
 # Mensajes predefinidos
 RESPUESTAS = {
