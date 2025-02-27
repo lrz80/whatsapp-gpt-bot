@@ -8,11 +8,9 @@ from unidecode import unidecode
 
 app = Flask(__name__)
 
-# Función para traducir texto (Ahora es async)
-async def traducir_texto(texto, idioma_destino):
-    """Traduce el texto al idioma deseado de manera asíncrona."""
+def traducir_texto(texto, idioma_destino):
     traductor = Translator()
-    traduccion = await asyncio.to_thread(traductor.translate, texto, dest=idioma_destino)
+    traduccion = traductor.translate(texto, dest=idioma_destino)
     return traduccion.text
 
 # Función para detectar el idioma
@@ -34,9 +32,8 @@ def enviar_respuesta(resp, mensaje):
     for parte in partes:
         resp.message(str(parte))  # Envía cada parte como mensaje separado
 
-# Ruta del webhook para recibir mensajes
 @app.route("/webhook", methods=["POST"])
-async def whatsapp_reply():
+def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp."""
     incoming_msg = request.values.get("Body", "").strip()
     idioma_detectado = detectar_idioma(incoming_msg)  # Detecta idioma
@@ -57,7 +54,7 @@ async def whatsapp_reply():
     respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
 
     # Traducir la respuesta al idioma detectado
-    respuesta = await traducir_texto(respuesta, idioma_detectado)
+    respuesta = traducir_texto(respuesta, idioma_detectado)  # ✅ Versión síncrona
 
     # Enviar la respuesta
     enviar_respuesta(resp, respuesta)
