@@ -12,7 +12,12 @@ def traducir_texto(texto, idioma_destino):
     """Traduce el texto al idioma deseado de forma síncrona."""
     traductor = Translator()
     traduccion = traductor.translate(texto, dest=idioma_destino)
-    return traduccion.text  # Asegura que devuelve el texto directamente
+    
+    # Esperar la traducción si es una corutina
+    if hasattr(traduccion, "result"):
+        traduccion = traduccion.result()
+
+    return traduccion.text
 
 # Función para detectar el idioma
 def detectar_idioma(texto):
