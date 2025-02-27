@@ -109,4 +109,6 @@ def bot():
     return str(response)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))  # Usa el puerto asignado por Railway
+    app.run(host="0.0.0.0", port=port, debug=True)
+
