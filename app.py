@@ -15,7 +15,7 @@ def enviar_respuesta(resp, mensaje):
     partes = [mensaje[i:i+limite] for i in range(0, len(mensaje), limite)]
     
     for parte in partes:
-        resp.message(parte)  # Envía cada parte como un mensaje separado
+        resp.message(str(parte))  # Envía cada parte como un mensaje separado
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
