@@ -20,8 +20,8 @@ def enviar_respuesta(resp, mensaje):
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
     """Maneja los mensajes entrantes de WhatsApp"""
-    incoming_msg = request.values.get("Body", "").strip().lower()
-    incoming_msg = normalizar_texto(incoming_msg)  # 🔹 Normalizar mensaje
+    incoming_msg = normalizar_texto(request.values.get("Body", "").strip())  
+    print(f"Mensaje recibido (normalizado): {incoming_msg}")  # Debug
 
     resp = MessagingResponse()
 
@@ -30,14 +30,23 @@ def whatsapp_reply():
     # 🔹 Normalizar claves del diccionario RESPUESTAS
     RESPUESTAS_NORMALIZADAS = {normalizar_texto(k): v for k, v in RESPUESTAS.items()}
 
-    # 🔹 Buscar palabra clave dentro del mensaje usando regex
-    respuesta = next(
-    (RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS 
-    if key and re.search(rf"\b{re.escape(key)}\b", incoming_msg)), None)
+    print(f"Palabras clave disponibles: {list(RESPUESTAS_NORMALIZADAS.keys())}")  
 
-    # Si no encuentra coincidencia, asigna el mensaje por defecto
-    if respuesta is None:
-        respuesta = "Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."
+    respuesta = None  
+    for claves, resp in RESPUESTAS.items():  
+        if isinstance(claves, tuple):  # Si la clave es una tupla (lista de palabras)  
+            if any(re.search(rf"\b{re.escape(key)}\b", incoming_msg) for key in claves):  
+                respuesta = resp  
+                break  
+        else:  # Si la clave es una sola palabra  
+            if re.search(rf"\b{re.escape(claves)}\b", incoming_msg):  
+                respuesta = resp  
+                break  
+
+    if respuesta is None:  
+        respuesta = "Lo siento, no entiendo tu mensaje. Escribe 'ayuda' para más información."  
+
+    print(f"Respuesta encontrada: {respuesta}")  # Debug  
 
     # 📩 Enviar respuesta
     if isinstance(respuesta, (list, tuple)): 
@@ -52,7 +61,7 @@ def whatsapp_reply():
 
 # Mensajes predefinidos
 RESPUESTAS = {
-    "hola o buenas": "¡Hola! Bienvenido a Spinzone Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
+    ("hola", "buenas" "buenos días", "buenas tardes", "buenas noches"): "¡Hola! Bienvenido a Spinzone Indoor Cycling 🚴‍♂️. ¿En qué puedo ayudarte?",
     "horarios": """**Nuestros horarios son:**
 
     **Cycling:**
@@ -88,7 +97,7 @@ RESPUESTAS = {
         
         "Si tienes alguna otra pregunta, estaré encantado de ayudarte.\n¡Esperamos verte pronto pedaleando y entrenando con nosotros!",
     ],
-    "**no me deja seleccionar numero de bicicleta o bici**":
+    ("**no me deja seleccionar numero de bicicleta**", "bici"):
     "🛠 **Solución para seleccionar número de bicicleta**\n"  
     "🔹 A veces, cuando es la primera reserva, el sistema asigna automaticamente una bicicleta.\n"  
     "\n"
