@@ -11,7 +11,7 @@ app = Flask(__name__)
 def traducir_texto(texto, idioma_destino):
     traductor = Translator()
     traduccion = traductor.translate(texto, dest=idioma_destino)
-    return traduccion.text
+    return getattr(traduccion, 'text', texto)  # Evita errores si la traducción falla
 
 # Función para detectar el idioma
 def detectar_idioma(texto):
