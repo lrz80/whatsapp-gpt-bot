@@ -10,12 +10,12 @@ def normalizar_texto(texto):
     return unidecode(texto.lower())  # Convierte a minúsculas y elimina acentos
 
 def enviar_respuesta(resp, mensaje):
-    """Divide y envía mensajes largos en partes más cortas."""
-    limite = 1500  # Máximo seguro antes de 1600
+    """Divide y envía mensajes largos en partes más cortas para evitar el límite de Twilio."""
+    limite = 1500  # Máximo seguro antes de 1600 caracteres
     partes = [mensaje[i:i+limite] for i in range(0, len(mensaje), limite)]
     
     for parte in partes:
-        resp.message(parte)
+        resp.message(parte)  # Envía cada parte como un mensaje separado
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
@@ -52,9 +52,10 @@ RESPUESTAS = {
     **Clases Funcionales:**
     Lunes a Jueves: 10am y 5:30pm.
     Viernes: 10am. 📅""",
-    "ubicacion": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
-    "contacto": "Puedes llamarnos al +8633171646 o escribirnos por WhatsApp. 📞",
-    "precios": """Aca te comparto nuestra lista de precios:
+    "**¿Dónde estamos ubicados?**": "Estamos ubicados en 2175 Davenport Blvd Davenport Fl 33837. 📍",
+    "**numero de contacto o telefono**": "Puedes llamarnos al +8633171646 o escribirnos por WhatsApp. 📞",
+    "**¿Cómo reservar una clase o clase gratis?**": "Puedes agendar tu clase fácilmente registrandote a través de nuestro sitio web  https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o enviarnos:\nNombre.\nApellido.\nFecha de Nacimiento.\nNumero de Telefono\nEmail\nal WhatsApp +18633171646.",
+    "**precios o membresias**": """Te comparto nuestra lista de precios:
 
     **Primera clase GRATIS**
     4 Clases: $49.99
@@ -72,15 +73,13 @@ RESPUESTAS = {
         
         "**¿Qué son las Clases Funcionales?**\nAdemás del indoor cycling, ofrecemos clases funcionales, entrenamientos diseñados para trabajar todo el cuerpo con ejercicios que mejoran la fuerza, resistencia y coordinación. Utilizamos una combinación de peso corporal, bandas, mancuernas y otros elementos para garantizar un entrenamiento completo y efectivo.", 
         
-        "**¿Por qué elegir Spinzone?**\nClases dinámicas para todos los niveles.\nEntrenamiento guiado por instructores certificados.\nAmbiente motivador con música y energía inigualables.\nEquipos de última tecnología para un rendimiento óptimo.",
-        
-        "**¿Dónde estamos ubicados?**\n2175 Davenport Blvd Davenport Fl 33837.", 
+        "**¿Por qué elegir Spinzone?**\nClases dinámicas para todos los niveles.\nEntrenamiento guiado por instructores certificados.\nAmbiente motivador con música y energía inigualables.\nEquipos de última tecnología para un rendimiento óptimo.", 
         
         "**¿Cómo reservar una clase?**\nPuedes agendar tu clase fácilmente registrandote a través de nuestro sitio web  https://app.glofox.com/portal/#/branch/6499ecc2ba29ef91ae07e461/classes-day-view o enviarnos:\nNombre.\nApellido.\nFecha de Nacimiento.\nNumero de Telefono\nEmail\nal WhatsApp +18633171646.",
         
         "Si tienes alguna otra pregunta, estaré encantado de ayudarte.\n¡Esperamos verte pronto pedaleando y entrenando con nosotros!",
     ],
-    "no me deja seleccionar numero de bicicleta":
+    "**no me deja seleccionar numero de bicicleta o bici**":
     "🛠 **Solución para seleccionar número de bicicleta**\n"  
     "🔹 A veces, cuando es la primera reserva, el sistema asigna automaticamente una bicicleta.\n"  
     "\n"
