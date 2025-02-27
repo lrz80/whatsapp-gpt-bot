@@ -1,37 +1,27 @@
+import os
+import openai
+import unicodedata
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
-import os
-import asyncio
-from googletrans import Translator
 from langdetect import detect
-from unidecode import unidecode
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# Definir respuestas predefinidas antes de usarla
+PREDEFINED_RESPONSES = {
+    "hola": "¡Hola! ¿En qué puedo ayudarte?",
+    "buenas": "¡Hola! ¿En qué puedo ayudarte?",
+    "buenas tardes": "¡Hola! ¿En qué puedo ayudarte?",
+}
 
 app = Flask(__name__)
 
-def traducir_texto(texto, idioma_destino):
-    """Traduce el texto al idioma deseado de forma síncrona."""
-    traductor = Translator()
-    traduccion = asyncio.run(traductor.translate(texto, dest=idioma_destino))  # ✅ Ejecuta la corutina en modo síncrono
-    return traduccion.text
+def has_accent(word):
+    normalized = unicodedata.normalize('NFD', word)
+    return any(char in "́̀̈" for char in normalized)  # Detecta tildes, diéresis
 
-# Función para detectar el idioma
-def detectar_idioma(texto):
-    try:
-        return detect(texto)
-    except:
-        return "es"  # Si hay error, por defecto español
-
-# Normalizar texto (minúsculas y sin acentos)
-def normalizar_texto(texto):
-    return unidecode(texto.lower())
-
-# Función para dividir mensajes largos
-def enviar_respuesta(resp, mensaje):
-    """Divide y envía mensajes largos para evitar el límite de Twilio."""
-    limite = 1500  # Máximo seguro antes de 1600 caracteres
-    partes = [mensaje[i:i+limite] for i in range(0, len(mensaje), limite)]
-    for parte in partes:
-        resp.message(str(parte))  # Envía cada parte como mensaje separado
+def split_message(text, max_length=1600):
+    return [text[i:i+max_length] for i in range(0, len(text), max_length)]
 
 # Mensajes predefinidos
 RESPUESTAS = {
@@ -86,40 +76,37 @@ RESPUESTAS = {
     "📲 Si después de intentar estos pasos aún tienes problemas, contáctanos por WhatsApp al **+18633171646**."
 }
 
-RESPUESTAS_NORMALIZADAS = {}
-
-@app.route("/webhook", methods=["POST"])
-def whatsapp_reply():
-    """Maneja los mensajes entrantes de WhatsApp de forma síncrona."""
-    incoming_msg = request.values.get("Body", "").strip()
-    idioma_detectado = detectar_idioma(incoming_msg)
-    incoming_msg = normalizar_texto(incoming_msg)
-
-    resp = MessagingResponse()
-
-    # ✅ Asegurar que RESPUESTAS_NORMALIZADAS se llena correctamente
-    RESPUESTAS_NORMALIZADAS.clear()
-    RESPUESTAS_NORMALIZADAS.update({k: v for k, v in RESPUESTAS.items()})
-
-    respuesta = RESPUESTAS_NORMALIZADAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje.")
-
-    respuesta = traducir_texto(respuesta, idioma_detectado)  # Traducción en modo síncrono
+@app.route("/bot", methods=["POST"])
+def bot():
+    incoming_msg = request.form.get("Body", "").strip().lower()
+    response = MessagingResponse()
     
-    # ✅ Asegurar que RESPUESTAS_NORMALIZADAS existe antes de usarla
-    if incoming_msg in RESPUESTAS_NORMALIZADAS:
-        respuesta = RESPUESTAS_NORMALIZADAS[incoming_msg]
-    else:
-        respuesta = "Lo siento, no entiendo tu mensaje."
+    # Si el mensaje está en respuestas predefinidas
+    if incoming_msg in PREDEFINED_RESPONSES:
+        response.message(PREDEFINED_RESPONSES[incoming_msg])
+        return str(response)
 
-    # Buscar palabra clave en el mensaje
-    respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
+    # Detectar idioma
+    try:
+        lang = detect(incoming_msg)
+    except:
+        lang = "unknown"
+    
+    # Generar respuesta con OpenAI
+    try:
+        completion = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": incoming_msg}]
+        )
+        bot_response = completion["choices"][0]["message"]["content"]
+    except Exception as e:
+        bot_response = "Lo siento, hubo un error procesando tu mensaje."
 
-    # Enviar la respuesta
-    enviar_respuesta(resp, respuesta)
+    # Dividir respuesta si es muy larga
+    for msg in split_message(bot_response):
+        response.message(msg)
 
-    print(f"📩 Respuesta enviada: {respuesta}")
-
-    return str(resp)
+    return str(response)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=False)
+    app.run(debug=True)
