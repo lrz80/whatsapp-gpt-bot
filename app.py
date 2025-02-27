@@ -85,8 +85,6 @@ RESPUESTAS = {
     "\n"
     "📲 Si después de intentar estos pasos aún tienes problemas, contáctanos por WhatsApp al **+18633171646**."
 }
-# Definir RESPUESTAS_NORMALIZADAS antes de usarla
-RESPUESTAS_NORMALIZADAS = {k: v for k, v in RESPUESTAS.items()}
 
 @app.route("/webhook", methods=["POST"])
 def whatsapp_reply():
@@ -98,9 +96,10 @@ def whatsapp_reply():
     resp = MessagingResponse()
     respuesta = RESPUESTAS_NORMALIZADAS.get(incoming_msg, "Lo siento, no entiendo tu mensaje.")
     respuesta = traducir_texto(respuesta, idioma_detectado)  # Traducción en modo síncrono
-
-    # ✅ Asegurar que RESPUESTAS_NORMALIZADAS existe antes de usarla
     global RESPUESTAS_NORMALIZADAS  
+    RESPUESTAS_NORMALIZADAS = {k: v for k, v in RESPUESTAS.items()}
+    
+    # ✅ Asegurar que RESPUESTAS_NORMALIZADAS existe antes de usarla
     if incoming_msg in RESPUESTAS_NORMALIZADAS:
         respuesta = RESPUESTAS_NORMALIZADAS[incoming_msg]
     else:
