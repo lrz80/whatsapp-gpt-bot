@@ -1,48 +1,50 @@
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import os
-import re
-from unidecode import unidecode
-from langdetect import detect
-from googletrans import Translator
 import asyncio
+from googletrans import Translator
+from langdetect import detect
+from unidecode import unidecode
 
 app = Flask(__name__)
 
+# Función para traducir texto (Ahora es async)
 async def traducir_texto(texto, idioma_destino):
-    """Traduce el texto al idioma deseado"""
+    """Traduce el texto al idioma deseado de manera asíncrona."""
     traductor = Translator()
-    traduccion = await traductor.translate(texto, dest=idioma_destino)
+    traduccion = await asyncio.to_thread(traductor.translate, texto, dest=idioma_destino)
     return traduccion.text
 
+# Función para detectar el idioma
 def detectar_idioma(texto):
     try:
         return detect(texto)
     except:
         return "es"  # Si hay error, por defecto español
 
+# Normalizar texto (minúsculas y sin acentos)
 def normalizar_texto(texto):
-    return unidecode(texto.lower())  # Convierte a minúsculas y elimina acentos
+    return unidecode(texto.lower())
 
+# Función para dividir mensajes largos
 def enviar_respuesta(resp, mensaje):
-    """Divide y envía mensajes largos en partes más cortas para evitar el límite de Twilio."""
+    """Divide y envía mensajes largos para evitar el límite de Twilio."""
     limite = 1500  # Máximo seguro antes de 1600 caracteres
     partes = [mensaje[i:i+limite] for i in range(0, len(mensaje), limite)]
-    
     for parte in partes:
-        resp.message(str(parte))  # Envía cada parte como un mensaje separado
+        resp.message(str(parte))  # Envía cada parte como mensaje separado
 
+# Ruta del webhook para recibir mensajes
 @app.route("/webhook", methods=["POST"])
-def whatsapp_reply():
-    """Maneja los mensajes entrantes de WhatsApp"""
+async def whatsapp_reply():
+    """Maneja los mensajes entrantes de WhatsApp."""
     incoming_msg = request.values.get("Body", "").strip()
-    idioma_detectado = detectar_idioma(incoming_msg)  # Detectar el idioma
-    
-    incoming_msg = normalizar_texto(incoming_msg)  # Normalizar mensaje
+    idioma_detectado = detectar_idioma(incoming_msg)  # Detecta idioma
+    incoming_msg = normalizar_texto(incoming_msg)  # Normaliza el mensaje
 
     resp = MessagingResponse()
 
-    # Normalizar claves del diccionario RESPUESTAS
+# Normalizar claves del diccionario RESPUESTAS
     RESPUESTAS_NORMALIZADAS = {}
     for claves, valor in RESPUESTAS.items():
         if isinstance(claves, tuple):  # Si la clave es una tupla (varias palabras)
@@ -51,16 +53,16 @@ def whatsapp_reply():
         else:  # Si es una clave única
             RESPUESTAS_NORMALIZADAS[normalizar_texto(claves)] = valor
 
-    # Buscar palabra clave dentro del mensaje usando regex
+    # Buscar palabra clave en el mensaje
     respuesta = next((RESPUESTAS_NORMALIZADAS[key] for key in RESPUESTAS_NORMALIZADAS if key in incoming_msg), "Lo siento, no entiendo tu mensaje.")
 
-    # Traducir la respuesta si el usuario no habla español
+    # Traducir la respuesta al idioma detectado
     respuesta = await traducir_texto(respuesta, idioma_detectado)
 
     # Enviar la respuesta
     enviar_respuesta(resp, respuesta)
 
-    print(f"📢 Respuesta enviada: {respuesta}")
+    print(f"📩 Respuesta enviada: {respuesta}")
 
     return str(resp)
 
